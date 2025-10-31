@@ -66,7 +66,6 @@ RUN pip install --upgrade pip setuptools wheel && \
 # =============================================================================
 # INSTALLATION DES DÉPENDANCES NODE.JS
 # =============================================================================
-# =============================================================================
 # INSTALLATION DES DÉPENDANCES NODE.JS
 # =============================================================================
 COPY package*.json /app/
@@ -74,7 +73,12 @@ COPY tailwind.config.js postcss.config.js /app/
 RUN npm install && npm cache clean --force
 
 # =============================================================================
-# BUILD TAILWIND CSS (maintenant les fichiers existent)
+# COPIE DES FICHIERS STATIQUES POUR TAILWIND
+# =============================================================================
+COPY static/ /app/static/
+
+# =============================================================================
+# BUILD TAILWIND CSS
 # =============================================================================
 RUN npm run build:css
 
@@ -82,13 +86,9 @@ RUN npm run build:css
 # COPIE DU RESTE DU CODE
 # =============================================================================
 COPY . /app/
-# Puis lancez le build
-RUN npm run build:css
-
 # =============================================================================
 # COPIE DU CODE SOURCE
-# =============================================================================
-COPY . /app/
+
 
 # =============================================================================
 # CONFIGURATION DES PERMISSIONS
