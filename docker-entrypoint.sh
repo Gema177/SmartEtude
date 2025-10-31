@@ -100,7 +100,7 @@ main() {
 }
 
 # Gestion des signaux
-trap 'log "Arrêt de l'application..."; exit 0' SIGTERM SIGINT
+trap 'log "Arrêt de l'\''application..."; exit 0' SIGTERM SIGINT
 
 # Lancer la fonction principale
 main "$@"
