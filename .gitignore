@@ -234,3 +234,4 @@ uploads/
 media/
 staticfiles/
 collected_static/
+.env.save.1
