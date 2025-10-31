@@ -67,7 +67,7 @@ RUN pip install --upgrade pip setuptools wheel && \
 # INSTALLATION DES DÉPENDANCES NODE.JS
 # =============================================================================
 COPY package*.json /app/
-RUN npm install --production && npm cache clean --force
+RUN npm install && npm cache clean --force
 
 # =============================================================================
 # CONFIGURATION DE TAILWIND CSS
