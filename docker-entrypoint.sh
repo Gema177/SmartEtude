@@ -83,7 +83,27 @@ main() {
     
     # Attendre les services
     wait_for_db
-    wait_for_redis
+    # Fonction pour attendre que Redis soit prêt
+wait_for_redis() {
+    log "Attente de Redis..."
+    
+    # Timeout de 30 secondes maximum
+    local timeout=30
+    local counter=0
+    
+    while [ $counter -lt $timeout ]; do
+        if python -c "import redis; redis.Redis.from_url('$REDIS_URL').ping()" 2>/dev/null; then
+            log "Redis prêt !"
+            return 0
+        fi
+        log "Redis non disponible, attente... ($((timeout - counter)) secondes restantes)"
+        sleep 2
+        counter=$((counter + 2))
+    done
+    
+    log "ATTENTION: Redis non disponible après $timeout secondes, continuation sans Redis"
+    return 1
+}
     
     # Initialisation
     run_migrations
