@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}📤 Upload de Cours - SmartEtude{% endblock %}
+
+{% block content %}
+<!-- Header de l'Upload -->
+<section class="bg-gradient-to-r from-green-600 to-blue-600 text-white py-16">
+    <div class="container mx-auto px-4 text-center">
+        <div class="max-w-3xl mx-auto">
+            <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+                <span class="text-4xl">📤</span>
+            </div>
+            <h1 class="text-4xl font-bold mb-4">
+                Upload de Cours
+            </h1>
+            <p class="text-xl opacity-90 mb-6">
+                Partagez vos connaissances et générez automatiquement des fiches de révision
+            </p>
+            <div class="flex items-center justify-center space-x-4 text-sm opacity-80">
+                <span class="flex items-center">
+                    <i class="fas fa-file-pdf mr-2"></i>PDF
+                </span>
+                <span class="flex items-center">
+                    <i class="fas fa-file-alt mr-2"></i>TXT
+                </span>
+                <span class="flex items-center">
+                    <i class="fas fa-robot mr-2"></i>IA
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Zone d'Upload -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Formulaire d'Upload -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+                <form method="post" enctype="multipart/form-data" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    <!-- Titre du cours -->
+                    <div>
+                        <label for="id_title" class="block text-lg font-semibold text-gray-800 mb-3">
+                            <i class="fas fa-heading mr-2 text-blue-500"></i>Titre du Cours
+                        </label>
+                        <input 
+                            type="text" 
+                            name="title" 
+                            id="id_title" 
+                            required
+                            class="w-full px-6 py-4 border-2 border-gray-200 rounded-xl text-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
+                            placeholder="Ex: Introduction à l'Intelligence Artificielle"
+                        >
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="id_description" class="block text-lg font-semibold text-gray-800 mb-3">
+                            <i class="fas fa-align-left mr-2 text-blue-500"></i>Description
+                        </label>
+                        <textarea 
+                            name="description" 
+                            id="id_description" 
+                            rows="4"
+                            class="w-full px-6 py-4 border-2 border-gray-200 rounded-xl text-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 resize-none"
+                            placeholder="Décrivez brièvement le contenu de votre cours..."
+                        ></textarea>
+                    </div>
+
+                    <!-- Fichier -->
+                    <div>
+                        <label for="id_file" class="block text-lg font-semibold text-gray-800 mb-3">
+                            <i class="fas fa-file-upload mr-2 text-blue-500"></i>Fichier à Uploader
+                        </label>
+                        
+                        <!-- Zone de drop -->
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center hover:border-blue-400 hover:bg-blue-50 transition-all duration-200" id="drop-zone">
+                            <div class="space-y-4">
+                                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                                    <span class="text-3xl text-blue-600">📁</span>
+                                </div>
+                                <div>
+                                    <p class="text-xl font-semibold text-gray-700 mb-2">
+                                        Glissez-déposez votre fichier ici
+                                    </p>
+                                    <p class="text-gray-500 mb-4">
+                                        ou cliquez pour sélectionner un fichier
+                                    </p>
+                                    <p class="text-sm text-gray-400">
+                                        Formats supportés : PDF, TXT (Max: 10MB)
+                                    </p>
+                                </div>
+                                <input 
+                                    type="file" 
+                                    name="file" 
+                                    id="id_file" 
+                                    required
+                                    accept=".pdf,.txt"
+                                    class="hidden"
+                                >
+                                <button 
+                                    type="button" 
+                                    onclick="document.getElementById('id_file').click()"
+                                    class="btn-modern btn-primary-modern"
+                                >
+                                    <i class="fas fa-folder-open mr-2"></i>Choisir un fichier
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Fichier sélectionné -->
+                        <div id="file-info" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                    <span id="file-name" class="font-medium text-green-800"></span>
+                                </div>
+                                <button 
+                                    type="button" 
+                                    onclick="clearFile()"
+                                    class="text-green-600 hover:text-green-800"
+                                >
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Options avancées -->
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-cog mr-2 text-blue-500"></i>Options Avancées
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Visibilité -->
+                            <div>
+                                <label class="flex items-center">
+                                    <input 
+                                        type="checkbox" 
+                                        name="is_public" 
+                                        id="id_is_public"
+                                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    >
+                                    <span class="ml-3 text-gray-700">Rendre le cours public</span>
+                                </label>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Les autres utilisateurs pourront voir et utiliser votre cours
+                                </p>
+                            </div>
+                            
+                            <!-- Génération automatique -->
+                            <div>
+                                <label class="flex items-center">
+                                    <input 
+                                        type="checkbox" 
+                                        name="auto_generate" 
+                                        id="id_auto_generate"
+                                        checked
+                                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    >
+                                    <span class="ml-3 text-gray-700">Génération automatique IA</span>
+                                </label>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    L'IA générera automatiquement un résumé et des quiz
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bouton d'upload -->
+                    <div class="text-center">
+                        <button 
+                            type="submit" 
+                            class="btn-modern btn-primary-modern text-lg px-12 py-4"
+                        >
+                            <i class="fas fa-rocket mr-3"></i>🚀 Lancer l'Upload et l'Analyse IA
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Informations sur le processus -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl p-6 text-center shadow-lg border border-gray-100">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl text-blue-600">📄</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">1. Extraction de Texte</h3>
+                    <p class="text-sm text-gray-600">
+                        Le système extrait automatiquement le contenu de votre document
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 text-center shadow-lg border border-gray-100">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl text-green-600">🧠</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">2. Analyse IA</h3>
+                    <p class="text-sm text-gray-600">
+                        L'intelligence artificielle analyse et résume le contenu
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 text-center shadow-lg border border-gray-100">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl text-purple-600">❓</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">3. Génération Quiz</h3>
+                    <p class="text-sm text-gray-600">
+                        Création automatique de questions pour tester la compréhension
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Scripts pour l'upload -->
+<script>
+// Gestion du drag & drop
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('id_file');
+const fileInfo = document.getElementById('file-info');
+const fileName = document.getElementById('file-name');
+
+// Prévenir le comportement par défaut
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+    document.body.addEventListener(eventName, preventDefaults, false);
+});
+
+// Mettre en évidence la zone de drop
+['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, unhighlight, false);
+});
+
+// Gérer le drop
+dropZone.addEventListener('drop', handleDrop, false);
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function highlight(e) {
+    dropZone.classList.add('border-blue-400', 'bg-blue-50');
+}
+
+function unhighlight(e) {
+    dropZone.classList.remove('border-blue-400', 'bg-blue-50');
+}
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleFiles(files);
+}
+
+// Gérer la sélection de fichier
+fileInput.addEventListener('change', function() {
+    handleFiles(this.files);
+});
+
+function handleFiles(files) {
+    if (files.length > 0) {
+        const file = files[0];
+        
+        // Vérifier la taille (10MB max)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Le fichier est trop volumineux. Taille maximum : 10MB');
+            return;
+        }
+        
+        // Vérifier le type
+        if (!file.type.includes('pdf') && !file.type.includes('text')) {
+            alert('Format de fichier non supporté. Utilisez PDF ou TXT.');
+            return;
+        }
+        
+        // Afficher les informations du fichier
+        fileName.textContent = file.name;
+        fileInfo.classList.remove('hidden');
+        
+        // Mettre à jour l'input
+        fileInput.files = files;
+    }
+}
+
+function clearFile() {
+    fileInput.value = '';
+    fileInfo.classList.add('hidden');
+    fileName.textContent = '';
+}
+
+// Animation au scroll
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('slide-in');
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.animate-on-scroll').forEach(el => {
+    observer.observe(el);
+});
+</script>
+
+<!-- Styles spécifiques -->
+<style>
+.btn-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary-modern {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Animation d'entrée */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    animation: slideInUp 0.6s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .text-4xl {
+        font-size: 2rem;
+    }
+    
+    .p-8 {
+        padding: 1.5rem;
+    }
+    
+    .p-12 {
+        padding: 2rem;
+    }
+}
+</style>
+{% endblock %}

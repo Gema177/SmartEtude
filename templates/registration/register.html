@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block title %}🚀 Inscription - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="mx-auto h-20 w-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-6">
+                <span class="text-white text-3xl">🚀</span>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                Rejoignez l'Aventure
+            </h2>
+            <p class="text-gray-600">
+                Créez votre compte et commencez à apprendre
+            </p>
+        </div>
+
+        <!-- Formulaire d'inscription -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            <form class="space-y-6" method="post">
+                {% csrf_token %}
+                
+                <!-- Nom d'utilisateur -->
+                <div>
+                    <label for="id_username" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user mr-2 text-blue-500"></i>Nom d'utilisateur
+                    </label>
+                    <input 
+                        id="id_username" 
+                        name="username" 
+                        type="text" 
+                        required 
+                        class="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all duration-200"
+                        placeholder="Choisissez un nom d'utilisateur unique"
+                    >
+                    {% if form.username.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Prénom -->
+                <div>
+                    <label for="id_first_name" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-id-card mr-2 text-blue-500"></i>Prénom
+                    </label>
+                    <input 
+                        id="id_first_name" 
+                        name="first_name" 
+                        type="text" 
+                        required 
+                        class="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all duration-200"
+                        placeholder="Votre prénom"
+                    >
+                    {% if form.first_name.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="id_email" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-envelope mr-2 text-blue-500"></i>Adresse email
+                    </label>
+                    <input 
+                        id="id_email" 
+                        name="email" 
+                        type="email" 
+                        required 
+                        class="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all duration-200"
+                        placeholder="votre.email@exemple.com"
+                    >
+                    {% if form.email.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Mot de passe -->
+                <div>
+                    <label for="id_password1" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-blue-500"></i>Mot de passe
+                    </label>
+                    <input 
+                        id="id_password1" 
+                        name="password1" 
+                        type="password" 
+                        required 
+                        class="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all duration-200"
+                        placeholder="Créez un mot de passe sécurisé"
+                    >
+                    {% if form.password1.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Confirmation du mot de passe -->
+                <div>
+                    <label for="id_password2" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-blue-500"></i>Confirmer le mot de passe
+                    </label>
+                    <input 
+                        id="id_password2" 
+                        name="password2" 
+                        type="password" 
+                        required 
+                        class="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-all duration-200"
+                        placeholder="Confirmez votre mot de passe"
+                    >
+                    {% if form.password2.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Conditions -->
+                <div class="flex items-center">
+                    <input 
+                        id="terms" 
+                        name="terms" 
+                        type="checkbox" 
+                        required
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    >
+                    <label for="terms" class="ml-2 block text-sm text-gray-900">
+                        J'accepte les 
+                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500">conditions d'utilisation</a>
+                        et la 
+                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500">politique de confidentialité</a>
+                    </label>
+                </div>
+
+                <!-- Bouton d'inscription -->
+                <div>
+                    <button 
+                        type="submit" 
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105"
+                    >
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <i class="fas fa-rocket text-blue-500 group-hover:text-blue-400"></i>
+                        </span>
+                        🚀 Créer mon compte
+                    </button>
+                </div>
+
+                <!-- Messages d'erreur généraux -->
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-red-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">
+                                Erreur d'inscription
+                            </h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </form>
+
+            <!-- Séparateur -->
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Déjà inscrit ?</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton de connexion -->
+            <div class="mt-6">
+                <a 
+                    href="{% url 'login' %}" 
+                    class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                >
+                    <i class="fas fa-sign-in-alt mr-2 text-blue-500"></i>
+                    Se connecter
+                </a>
+            </div>
+        </div>
+
+        <!-- Avantages de l'inscription -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 text-center">
+                ✨ Pourquoi nous rejoindre ?
+            </h3>
+            <div class="space-y-3">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                    <span class="text-sm text-gray-600">Accès à l'IA de pointe pour l'apprentissage</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                    <span class="text-sm text-gray-600">Génération automatique de fiches et quiz</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                    <span class="text-sm text-gray-600">Suivi de progression personnalisé</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                    <span class="text-sm text-gray-600">Communauté d'apprenants active</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles spécifiques -->
+<style>
+.form-input:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.btn-gradient:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Animation d'entrée */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-container {
+    animation: slideInUp 0.6s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .max-w-md {
+        max-width: 100%;
+        margin: 0 1rem;
+    }
+    
+    .p-8 {
+        padding: 1.5rem;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Quiz IA - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">
+                Quiz IA avec Phi-3
+            </h1>
+            <p class="text-gray-300 text-lg">{{ course.title }}</p>
+        </div>
+
+        <!-- Course Info -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-2">{{ course.title }}</h2>
+                    <p class="text-gray-300">{{ course.description|truncatewords:20 }}</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-400">Modèle IA</div>
+                    <div class="text-lg font-semibold text-blue-400">Phi-3-mini</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generation Form -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
+            <h3 class="text-2xl font-bold text-white mb-6"> Paramètres du quiz</h3>
+            
+            <form id="quizForm" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Nombre de questions -->
+                    <div>
+                        <label class="block text-white font-semibold mb-3">Nombre de questions</label>
+                        <select name="num_questions" class="w-full p-4 bg-white/20 border border-white/30 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="3">3 questions</option>
+                            <option value="5" selected>5 questions</option>
+                            <option value="10">10 questions</option>
+                            <option value="15">15 questions</option>
+                        </select>
+                    </div>
+
+                    <!-- Difficulté -->
+                    <div>
+                        <label class="block text-white font-semibold mb-3">Difficulté</label>
+                        <select name="difficulty" class="w-full p-4 bg-white/20 border border-white/30 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="easy">Facile</option>
+                            <option value="medium" selected>Moyen</option>
+                            <option value="hard">Difficile</option>
+                        </select>
+                    </div>
+
+                    <!-- Langue -->
+                    <div>
+                        <label class="block text-white font-semibold mb-3">Langue</label>
+                        <select name="language" class="w-full p-4 bg-white/20 border border-white/30 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="french" selected>Français</option>
+                            <option value="english">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Bouton de génération -->
+                <div class="text-center">
+                    <button type="submit" id="generateBtn" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-brain mr-2"></i>
+                        Générer le quiz
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <h3 class="text-xl font-bold text-white mb-2">Génération en cours...</h3>
+                <p class="text-gray-300">Phi-3 analyse votre cours et génère un quiz intelligent</p>
+                <p class="text-sm text-gray-400 mt-2">Vous serez automatiquement redirigé vers le jeu QCM</p>
+            </div>
+        </div>
+
+        <!-- Quiz Results (fallback si pas de redirection) -->
+        <div id="quizContainer" class="hidden">
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-white"> Quiz généré (mode fallback)</h3>
+                    <div class="flex space-x-2">
+                        <button id="copyQuizBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-copy mr-1"></i>Copier
+                        </button>
+                        <button id="downloadQuizBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-download mr-1"></i>Télécharger
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="quizContent" class="prose prose-invert max-w-none">
+                    <!-- Le quiz sera inséré ici en cas de fallback -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="hidden bg-red-500/20 backdrop-blur-sm rounded-2xl p-8 mb-8">
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle text-red-400 text-4xl mb-4"></i>
+                <h3 class="text-xl font-bold text-white mb-2">Erreur de génération</h3>
+                <p id="errorMessage" class="text-gray-300"></p>
+                <button onclick="location.reload()" class="mt-4 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors">
+                    Réessayer
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="text-center mt-8">
+            <a href="{% url 'course_detail' course.id %}" class="inline-flex items-center bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-xl border border-white/20 transition-all duration-300">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Retour au cours
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('quizForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    
+    // Afficher le loading
+    document.getElementById('loadingState').classList.remove('hidden');
+    document.getElementById('quizContainer').classList.add('hidden');
+    document.getElementById('errorState').classList.add('hidden');
+    
+    try {
+        const response = await fetch('', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Vérifier si on a une redirection vers le jeu
+            if (result.redirect_url) {
+                // Rediriger automatiquement vers le jeu QCM
+                window.location.href = result.redirect_url;
+            } else if (result.quiz) {
+                // Fallback vers l'ancien comportement (afficher le quiz)
+                document.getElementById('quizContent').innerHTML = result.quiz.replace(/\n/g, '<br>');
+                document.getElementById('quizContainer').classList.remove('hidden');
+            } else {
+                // Afficher le texte du quiz s'il y en a
+                document.getElementById('quizContent').innerHTML = (result.quiz_text || 'Quiz généré avec succès').replace(/\n/g, '<br>');
+                document.getElementById('quizContainer').classList.remove('hidden');
+            }
+        } else {
+            // Afficher l'erreur
+            document.getElementById('errorMessage').textContent = result.error || 'Erreur inconnue';
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+    } catch (error) {
+        document.getElementById('errorMessage').textContent = 'Erreur de connexion';
+        document.getElementById('errorState').classList.remove('hidden');
+    } finally {
+        document.getElementById('loadingState').classList.add('hidden');
+    }
+});
+
+// Copier le quiz
+document.getElementById('copyQuizBtn').addEventListener('click', function() {
+    const content = document.getElementById('quizContent').textContent;
+    navigator.clipboard.writeText(content).then(() => {
+        this.innerHTML = '<i class="fas fa-check mr-1"></i>Copié!';
+        setTimeout(() => {
+            this.innerHTML = '<i class="fas fa-copy mr-1"></i>Copier';
+        }, 2000);
+    });
+});
+
+// Télécharger le quiz
+document.getElementById('downloadQuizBtn').addEventListener('click', function() {
+    const content = document.getElementById('quizContent').textContent;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'quiz-{{ course.title|slugify }}.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+});
+</script>
+{% endblock %}

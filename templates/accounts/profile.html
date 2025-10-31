@@ -1,0 +1,131 @@
+{% extends 'base_tailwind.html' %}
+
+{% block title %}Profil - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 overflow-hidden">
+        <!-- Animated Particles -->
+        <div class="particle" style="--delay: 0s; --x: 10%;"></div>
+        <div class="particle" style="--delay: 2s; --x: 20%;"></div>
+        <div class="particle" style="--delay: 4s; --x: 80%;"></div>
+        <div class="particle" style="--delay: 6s; --x: 90%;"></div>
+        
+        <!-- Geometric Shapes -->
+        <div class="absolute top-20 left-10 w-32 h-32 border border-emerald-400/20 rounded-full animate-pulse"></div>
+        <div class="absolute top-40 right-20 w-24 h-24 border border-emerald-300/20 rotate-45 animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-20 left-1/4 w-16 h-16 border border-emerald-500/20 rounded-full animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center px-4 py-2 bg-emerald-500/10 border border-emerald-400/30 rounded-full text-emerald-300 text-sm font-medium mb-4">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                </svg>
+                Profil Utilisateur
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                Mon Profil
+            </h1>
+            <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+                Gérez vos informations personnelles et vos préférences
+            </p>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
+                <!-- User Info -->
+                <div class="text-center mb-8">
+                    <div class="w-24 h-24 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
+                        {{ user.username|first|upper }}
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">{{ user.username }}</h2>
+                    <p class="text-gray-300">{{ user.email }}</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-emerald-500/10 border border-emerald-400/30 rounded-xl p-6 text-center">
+                        <div class="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 5.477 5.754 5 7.5 5s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.523 18.246 19 16.5 19c-1.746 0-3.332-.477-4.5-1.253"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white mb-1">Cours Suivis</h3>
+                        <p class="text-2xl font-bold text-emerald-400">{{ courses_count }}</p>
+                    </div>
+
+                    <div class="bg-blue-500/10 border border-blue-400/30 rounded-xl p-6 text-center">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white mb-1">Quiz Complétés</h3>
+                        <p class="text-2xl font-bold text-blue-400">{{ quizzes_count }}</p>
+                    </div>
+
+                    <div class="bg-purple-500/10 border border-purple-400/30 rounded-xl p-6 text-center">
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white mb-1">Score Moyen</h3>
+                        <p class="text-2xl font-bold text-purple-400">0%</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'home' %}" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 font-medium text-center">
+                        <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Retour à l'Accueil
+                    </a>
+                    
+                    <a href="{% url 'upload' %}" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 font-medium text-center">
+                        <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        Uploader un Cours
+                    </a>
+                    
+                    <a href="{% url 'logout' %}" class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all duration-300 font-medium text-center">
+                        <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: linear-gradient(45deg, #10b981, #34d399);
+        border-radius: 50%;
+        animation: float 8s infinite;
+        animation-delay: var(--delay);
+        left: var(--x);
+        opacity: 0.6;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
+        50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+    }
+</style>
+{% endblock %}

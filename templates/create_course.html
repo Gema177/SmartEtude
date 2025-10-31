@@ -1,0 +1,247 @@
+{% extends 'base_tailwind.html' %}
+
+{% block title %}Créer un Nouveau Cours - SmartEtude{% endblock %}
+
+{% block content %}
+<!-- Messages Django -->
+{% if messages %}
+<div class="fixed top-4 right-4 z-50 space-y-2">
+    {% for message in messages %}
+    <div class="{% if message.tags == 'success' %}bg-green-500{% elif message.tags == 'error' %}bg-red-500{% elif message.tags == 'warning' %}bg-yellow-500{% else %}bg-blue-500{% endif %} text-white px-6 py-3 rounded-lg shadow-lg max-w-md animate-slide-in-right">
+        <div class="flex items-center justify-between">
+            <span class="flex items-center">
+                {% if message.tags == 'success' %}
+                    <i class="fas fa-check-circle mr-2"></i>
+                {% elif message.tags == 'error' %}
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                {% elif message.tags == 'warning' %}
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                {% else %}
+                    <i class="fas fa-info-circle mr-2"></i>
+                {% endif %}
+                {{ message }}
+            </span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-emerald-900 relative overflow-hidden">
+    <!-- Particules animées en arrière-plan -->
+    <div class="absolute inset-0">
+        <div class="particle" style="--delay: 0s; --x: 10%;"></div>
+        <div class="particle" style="--delay: 2s; --x: 25%;"></div>
+        <div class="particle" style="--delay: 4s; --x: 45%;"></div>
+        <div class="particle" style="--delay: 6s; --x: 65%;"></div>
+        <div class="particle" style="--delay: 8s; --x: 85%;"></div>
+    </div>
+
+    <!-- Formes géométriques tech -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-20 w-80 h-80 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-full blur-3xl animate-float-delayed"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+    </div>
+
+    <!-- Grille tech -->
+    <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+
+    <div class="relative z-10 min-h-screen flex items-center justify-center px-4 py-20">
+        <div class="max-w-2xl w-full">
+            <!-- Card de création -->
+            <div class="glass-card p-8 rounded-3xl backdrop-blur-2xl border border-white/20 shadow-2xl">
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                        <i class="fas fa-plus text-3xl text-white"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-white mb-4">Créer un Nouveau Cours</h1>
+                    <p class="text-gray-300">Uploadez votre document et nous générerons automatiquement un résumé</p>
+                </div>
+
+                <!-- Formulaire -->
+                <form method="post" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Titre du cours -->
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-book mr-2"></i>
+                            Titre du cours
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-align-left mr-2"></i>
+                            Description (optionnelle)
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Upload de fichier -->
+                    <div>
+                        <label for="{{ form.file.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-upload mr-2"></i>
+                            Document à analyser
+                        </label>
+                        <div class="relative">
+                            {{ form.file }}
+                            <div class="mt-2 text-sm text-gray-400">
+                                Formats supportés : PDF, DOCX, TXT (max 10MB)
+                            </div>
+                        </div>
+                        {% if form.file.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.file.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Niveau de difficulté -->
+                    <div>
+                        <label for="{{ form.difficulty.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            Niveau de difficulté
+                        </label>
+                        {{ form.difficulty }}
+                        {% if form.difficulty.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.difficulty.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Visibilité -->
+                    <div>
+                        <label class="flex items-center space-x-3">
+                            {{ form.is_public }}
+                            <span class="text-gray-300">
+                                <i class="fas fa-globe mr-2"></i>
+                                Rendre ce cours public
+                            </span>
+                        </label>
+                        <p class="text-sm text-gray-400 mt-1">Les cours publics sont visibles par tous les utilisateurs</p>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <span class="flex items-center justify-center">
+                                <i class="fas fa-upload mr-2"></i>
+                                Créer le Cours
+                            </span>
+                        </button>
+                        
+                        <a href="{% url 'dashboard' %}" class="flex-1 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl border border-white/20 transition-all duration-300 text-center">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Retour au Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: linear-gradient(45deg, #10b981, #059669);
+    border-radius: 50%;
+    animation: float-up 30s linear infinite;
+    animation-delay: var(--delay);
+    left: var(--x);
+    opacity: 0.7;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+@keyframes float-up {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.7; }
+    90% { opacity: 0.7; }
+    100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes float-delayed {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(20px) rotate(-180deg); }
+}
+
+.animate-float { animation: float 8s ease-in-out infinite; }
+.animate-float-delayed { animation: float-delayed 10s ease-in-out infinite; }
+.animate-pulse-slow { animation: pulse 4s ease-in-out infinite; }
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(25px);
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bg-grid-pattern {
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Styles pour les champs de formulaire */
+input[type="text"], input[type="file"], textarea, select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+input[type="text"]::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+input[type="file"] {
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="file"]:hover {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: #10b981;
+}
+</style>
+{% endblock %}

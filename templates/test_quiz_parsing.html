@@ -1,0 +1,85 @@
+{% extends 'base_tailwind.html' %}
+
+{% block title %}Test Parsing Quiz IA{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-2xl font-bold text-gray-900 mb-6">Test du Parsing de Quiz IA</h1>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <div>
+                    <label for="quiz_text" class="block text-sm font-medium text-gray-700 mb-2">
+                        Texte du quiz généré par l'IA :
+                    </label>
+                    <textarea
+                        id="quiz_text"
+                        name="quiz_text"
+                        rows="20"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Collez ici le texte du quiz généré par l'IA..."
+                        required
+                    >Quiz IA - Test
+4 questions
+
+1. Quel est le rôle principal des smartphones dans notre vie quotidienne ?
+A) Ils servent uniquement à passer des appels
+B) Ils sont principalement utilisés pour la photographie
+C) Ils agissent comme des centres de divertissement, des cartes et des portefeuilles
+D) Ils ne sont pas mentionnés dans le texte
+
+2. Comment la technologie a-t-elle amélioré les soins de santé ?
+A) En rendant les hôpitaux moins nécessaires
+B) En permettant aux médecins de diagnostiquer plus rapidement et précisément
+C) En supprimant tous les coûts associés aux soins
+D) En rendant la médecine traditionnelle obsolète
+
+3. Quel impact la pandémie de COVID-19 a-t-elle eu sur l'éducation selon le texte ?
+A) Elle a fermé toutes les écoles pour toujours
+B) Elle a montré que l'éducation peut continuer grâce aux plateformes d'apprentissage en ligne
+C) Elle a rendu l'éducation inaccessible pour les étudiants
+D) Elle a été bénéfique pour l'éducation traditionnelle uniquement
+
+4. Quels sont certains des problèmes associés à l'essor des réseaux sociaux mentionnés dans le texte ?
+A) La baisse de l'interaction sociale
+B) La connexion entre des personnes du monde entier
+C) L'addiction, la désinformation et le cyberharcèlement
+D) L'augmentation de la productivité au travail
+
+**Réponse correcte : C**
+*Explication : Le texte souligne que bien que les réseaux sociaux connectent les gens, ils entraînent également des problèmes comme l'addiction*
+
+**Réponse correcte : B**
+*Explication : Le texte explique que l'utilisation de machines avancées et de systèmes d'intelligence artificielle permet aux médecins de détecter les maladies*
+
+**Réponse correcte : B**
+*Explication : Le texte indique que durant la pandémie, les cours en ligne ont permis de*
+
+**Réponse correcte : C**
+*Explication : Le texte souligne que bien que les réseaux sociaux connectent les gens, ils entraînent également des problèmes comme l'addiction et*</textarea>
+                </div>
+
+                <div class="flex justify-center">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors">
+                        🔍 Tester le parsing
+                    </button>
+                </div>
+            </form>
+
+            {% if messages %}
+            <div class="mt-8">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Résultats du test :</h2>
+                {% for message in messages %}
+                <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+                    <p class="text-yellow-800">{{ message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{
+  "name": "smartetude",
+  "version": "1.0.0",
+  "description": "SmartEtude - Plateforme de révision intelligente avec IA",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run build:css:watch",
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "tailwindcss -i ./static/src/input.css -o ./static/css/output.css --minify",
+    "build:css:watch": "tailwindcss -i ./static/src/input.css -o ./static/css/output.css --watch",
+    "build:js": "webpack --mode production",
+    "build:js:dev": "webpack --mode development --watch",
+    "lint": "eslint ./static/src/**/*.js",
+    "lint:fix": "eslint ./static/src/**/*.js --fix",
+    "format": "prettier --write ./static/src/**/*.{js,css,html}",
+    "test": "echo \"Tests JavaScript à implémenter\" && exit 0",
+    "clean": "rm -rf ./static/css/output.css ./static/js/bundle.js",
+    "install:dev": "npm install && pip install -r requirements.txt",
+    "start:dev": "npm run build:css:watch & python manage.py runserver",
+    "docker:build": "docker build -t revision-intelligente .",
+    "docker:run": "docker run -p 8000:8000 revision-intelligente"
+  },
+  "keywords": [
+    "django",
+    "tailwindcss",
+    "ai",
+    "education",
+    "revision",
+    "quiz",
+    "machine-learning"
+  ],
+  "author": "Votre Nom <votre.email@example.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "postcss": "^8.4.32",
+    "postcss-cli": "^10.1.0",
+    "prettier": "^3.1.1",
+    "tailwindcss": "^3.3.6",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0",
+    "alpinejs": "^3.13.3"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/votre-username/plateforme-revision-intelligente.git"
+  },
+  "bugs": {
+    "url": "https://github.com/votre-username/plateforme-revision-intelligente/issues"
+  },
+  "homepage": "https://github.com/votre-username/plateforme-revision-intelligente#readme"
+}

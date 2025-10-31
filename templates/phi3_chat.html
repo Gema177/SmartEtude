@@ -1,0 +1,275 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Chat IA - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">
+                💬 Chat IA (OpenAI)
+            </h1>
+            <p class="text-gray-300 text-lg">{{ course.title }}</p>
+        </div>
+
+        <!-- Course Info -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-2">{{ course.title }}</h2>
+                    <p class="text-gray-300">{{ course.description|truncatewords:20 }}</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-400">Modèle IA</div>
+                    <div class="text-lg font-semibold text-blue-400">{{ model_info.model_name|default:'gpt-4o-mini' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="bg-slate-800/80 rounded-2xl p-6 mb-8 relative z-10 shadow-xl overflow-hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-white">💬 Conversation</h3>
+                <div class="flex space-x-2">
+                    <select id="languageSelect" class="bg-white/20 border border-white/30 rounded-lg text-white px-3 py-1 text-sm">
+                        <option value="french" selected>Français</option>
+                        <option value="english">English</option>
+                    </select>
+                    <button id="clearChat" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-trash mr-1"></i>Effacer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="max-h-[70vh] overflow-y-auto overflow-x-hidden mb-6 space-y-4 p-4 bg-slate-900/40 rounded-xl break-words break-all whitespace-pre-wrap scroll-smooth">
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="bg-blue-500/20 rounded-lg p-3 max-w-3xl">
+                        <p class="text-white break-words whitespace-pre-wrap">Bonjour ! Je suis votre assistant IA. Posez-moi des questions sur le cours "{{ course.title }}" et je vous aiderai à mieux comprendre le contenu.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <form id="chatForm" class="flex space-x-4">
+                {% csrf_token %}
+                <input type="text" id="questionInput" placeholder="Posez votre question sur le cours..." 
+                       class="flex-1 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400/60"
+                       required>
+                <button type="submit" id="sendBtn" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+
+            
+        </div>
+
+        <!-- Suggestions -->
+        <div class="bg-slate-800/70 rounded-2xl p-6 mb-8 relative z-0 max-w-5xl mx-auto shadow-lg">
+            <h3 class="text-xl font-bold text-white mb-4">💡 Questions suggérées</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="suggestion-btn bg-white/10 hover:bg-white/20 text-white p-4 rounded-lg text-left transition-colors" data-question="Peux-tu me résumer les points clés de ce cours ?">
+                    <i class="fas fa-list-ul mr-2 text-blue-400"></i>
+                    Résumer les points clés
+                </button>
+                <button class="suggestion-btn bg-white/10 hover:bg-white/20 text-white p-4 rounded-lg text-left transition-colors" data-question="Quels sont les concepts les plus importants à retenir ?">
+                    <i class="fas fa-lightbulb mr-2 text-yellow-400"></i>
+                    Concepts importants
+                </button>
+                <button class="suggestion-btn bg-white/10 hover:bg-white/20 text-white p-4 rounded-lg text-left transition-colors" data-question="Peux-tu m'expliquer ce cours de manière simple ?">
+                    <i class="fas fa-graduation-cap mr-2 text-green-400"></i>
+                    Explication simple
+                </button>
+                <button class="suggestion-btn bg-white/10 hover:bg-white/20 text-white p-4 rounded-lg text-left transition-colors" data-question="Quels exemples pratiques peux-tu me donner ?">
+                    <i class="fas fa-code mr-2 text-purple-400"></i>
+                    Exemples pratiques
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="text-center">
+            <a href="{% url 'course_detail' course.id %}" class="inline-flex items-center bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-xl border border-white/20 transition-all duration-300">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Retour au cours
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+let isLoading = false;
+const chatMessagesEl = document.getElementById('chatMessages');
+
+function scrollToBottom(smooth = true) {
+    if (!chatMessagesEl) return;
+    const opts = { top: chatMessagesEl.scrollHeight };
+    if (smooth) opts.behavior = 'smooth';
+    chatMessagesEl.scrollTo(opts);
+}
+
+// (Bouton "aller en bas" supprimé)
+
+// Gestion du formulaire de chat
+document.getElementById('chatForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const questionInput = document.getElementById('questionInput');
+    const question = questionInput.value.trim();
+    
+    if (!question || isLoading) return;
+    // Nettoyer immédiatement l'input pour une meilleure UX
+    questionInput.value = '';
+    await sendMessage(question);
+});
+
+// Gestion des suggestions
+document.querySelectorAll('.suggestion-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const question = this.dataset.question;
+        // Déclenche directement l'envoi et nettoie le champ
+        const questionInput = document.getElementById('questionInput');
+        questionInput.value = '';
+        sendMessage(question);
+    });
+});
+
+// Fonction pour envoyer un message
+async function sendMessage(question) {
+    if (isLoading) return;
+    
+    isLoading = true;
+    const sendBtn = document.getElementById('sendBtn');
+    const originalContent = sendBtn.innerHTML;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    sendBtn.disabled = true;
+    
+    // Ajouter le message utilisateur
+    addMessage(question, 'user');
+    
+    // Ajouter un indicateur de chargement
+    const loadingId = addLoadingMessage();
+    
+    try {
+        const response = await fetch('', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                question: question,
+                language: document.getElementById('languageSelect').value
+            })
+        });
+        
+        const result = await response.json();
+        
+        // Supprimer l'indicateur de chargement
+        removeLoadingMessage(loadingId);
+        
+        if (result.success) {
+            addMessage(result.answer, 'assistant');
+        } else {
+            const err = result.error || "Désolé, une erreur s'est produite. Veuillez réessayer.";
+            addMessage(err, 'assistant', true);
+        }
+    } catch (error) {
+        removeLoadingMessage(loadingId);
+        addMessage('Erreur de connexion. Veuillez réessayer.', 'assistant', true);
+    } finally {
+        isLoading = false;
+        sendBtn.innerHTML = originalContent;
+        sendBtn.disabled = false;
+        // S'assurer que le champ de saisie est vide après envoi
+        const qi = document.getElementById('questionInput');
+        if (qi) qi.value = '';
+    }
+}
+
+// Ajouter un message au chat
+function addMessage(content, sender, isError = false) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'flex items-start space-x-3';
+    
+    if (sender === 'user') {
+        messageDiv.innerHTML = `
+            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-user text-white text-sm"></i>
+            </div>
+            <div class="bg-green-500/20 rounded-lg p-3 max-w-2xl md:max-w-3xl ml-auto overflow-hidden">
+                <p class="text-white break-words whitespace-pre-wrap">${content}</p>
+            </div>
+        `;
+    } else {
+        const iconClass = isError ? 'fas fa-exclamation-triangle text-red-400' : 'fas fa-robot text-white';
+        const bgClass = isError ? 'bg-red-500/20' : 'bg-blue-500/20';
+        
+        messageDiv.innerHTML = `
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <i class="${iconClass} text-sm"></i>
+            </div>
+            <div class="${bgClass} rounded-lg p-3 max-w-2xl md:max-w-3xl overflow-hidden">
+                <p class="text-white break-words whitespace-pre-wrap">${content}</p>
+            </div>
+        `;
+    }
+    
+    chatMessages.appendChild(messageDiv);
+    scrollToBottom(true);
+}
+
+// Ajouter un indicateur de chargement
+function addLoadingMessage() {
+    const chatMessages = document.getElementById('chatMessages');
+    const loadingDiv = document.createElement('div');
+    const loadingId = 'loading-' + Date.now();
+    loadingDiv.id = loadingId;
+    loadingDiv.className = 'flex items-start space-x-3';
+    loadingDiv.innerHTML = `
+        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-robot text-white text-sm"></i>
+        </div>
+        <div class="bg-blue-500/20 rounded-lg p-3 max-w-3xl">
+            <div class="flex items-center space-x-2">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <p class="text-white">Phi-3 réfléchit...</p>
+            </div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(loadingDiv);
+    scrollToBottom(true);
+    return loadingId;
+}
+
+// Supprimer l'indicateur de chargement
+function removeLoadingMessage(loadingId) {
+    const loadingElement = document.getElementById(loadingId);
+    if (loadingElement) {
+        loadingElement.remove();
+    }
+}
+
+// Effacer le chat
+document.getElementById('clearChat').addEventListener('click', function() {
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.innerHTML = `
+        <div class="flex items-start space-x-3">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-robot text-white text-sm"></i>
+            </div>
+            <div class="bg-blue-500/20 rounded-lg p-3 max-w-3xl">
+                <p class="text-white">Bonjour ! Je suis votre assistant IA Phi-3. Posez-moi des questions sur le cours "{{ course.title }}" et je vous aiderai à mieux comprendre le contenu.</p>
+            </div>
+        </div>
+    `;
+});
+</script>
+{% endblock %}

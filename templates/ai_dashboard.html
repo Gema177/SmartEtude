@@ -1,0 +1,216 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Tableau de Bord IA - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <!-- Particules animées -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold text-white mb-4">
+                <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+                    🤖 Assistant IA SmartEtude
+                </span>
+            </h1>
+            <p class="text-gray-300 text-xl">Votre compagnon intelligent pour l'apprentissage</p>
+        </div>
+
+        <!-- Statistiques IA -->
+        <div class="max-w-6xl mx-auto mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center">
+                    <div class="text-3xl font-bold text-purple-400 mb-2">{{ ai_stats.total_courses }}</div>
+                    <div class="text-gray-300">Cours Total</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center">
+                    <div class="text-3xl font-bold text-blue-400 mb-2">{{ ai_stats.courses_with_ai_summary }}</div>
+                    <div class="text-gray-300">Résumés IA</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center">
+                    <div class="text-3xl font-bold text-green-400 mb-2">{{ ai_stats.total_ai_quizzes }}</div>
+                    <div class="text-gray-300">Quiz IA</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center">
+                    <div class="text-3xl font-bold text-yellow-400 mb-2">∞</div>
+                    <div class="text-gray-300">Questions IA</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fonctionnalités IA -->
+        <div class="max-w-6xl mx-auto mb-8">
+            <h2 class="text-3xl font-bold text-white mb-6 text-center">Fonctionnalités IA Disponibles</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Résumé IA -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-purple-400/50 transition-all duration-300 group">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-robot text-purple-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Résumé IA Intelligent</h3>
+                        <p class="text-gray-300 text-sm mb-4">Génère des résumés structurés et adaptés à votre niveau avec ChatGPT</p>
+                        <div class="text-xs text-gray-400">
+                            ✓ Structuré par sections<br>
+                            ✓ Adapté au niveau<br>
+                            ✓ Points clés extraits
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz IA -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-yellow-400/50 transition-all duration-300 group">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-brain text-yellow-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Quiz IA Pratique</h3>
+                        <p class="text-gray-300 text-sm mb-4">Crée des questions contextuelles et des explications détaillées</p>
+                        <div class="text-xs text-gray-400">
+                            ✓ Questions contextuelles<br>
+                            ✓ Explications détaillées<br>
+                            ✓ Niveaux de difficulté
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat IA -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-pink-400/50 transition-all duration-300 group">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-pink-500/20 to-rose-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-comments text-pink-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Chat IA Interactif</h3>
+                        <p class="text-gray-300 text-sm mb-4">Posez vos questions et obtenez des réponses personnalisées</p>
+                        <div class="text-xs text-gray-400">
+                            ✓ Réponses en temps réel<br>
+                            ✓ Basé sur le contenu<br>
+                            ✓ Explications pédagogiques
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan d'étude IA -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-indigo-400/50 transition-all duration-300 group">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-calendar-alt text-indigo-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Plan d'Étude IA</h3>
+                        <p class="text-gray-300 text-sm mb-4">Génère un plan d'étude personnalisé selon votre temps disponible</p>
+                        <div class="text-xs text-gray-400">
+                            ✓ Plan personnalisé<br>
+                            ✓ Temps optimisé<br>
+                            ✓ Objectifs clairs
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommandations IA -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-teal-400/50 transition-all duration-300 group">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-teal-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-lightbulb text-teal-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Recommandations IA</h3>
+                        <p class="text-gray-300 text-sm mb-4">Suggère des cours et contenus basés sur vos performances</p>
+                        <div class="text-xs text-gray-400">
+                            ✓ Analyse des performances<br>
+                            ✓ Suggestions personnalisées<br>
+                            ✓ Progression optimisée
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics IA -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-emerald-400/50 transition-all duration-300 group">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-chart-line text-emerald-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Analytics IA</h3>
+                        <p class="text-gray-300 text-sm mb-4">Analyse vos patterns d'apprentissage et optimise votre progression</p>
+                        <div class="text-xs text-gray-400">
+                            ✓ Patterns d'apprentissage<br>
+                            ✓ Optimisation continue<br>
+                            ✓ Insights personnalisés
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cours récents avec actions IA -->
+        <div class="max-w-6xl mx-auto mb-8">
+            <h2 class="text-3xl font-bold text-white mb-6 text-center">Vos Cours - Actions IA</h2>
+            {% if courses %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for course in courses %}
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold text-white mb-2">{{ course.title }}</h3>
+                            <p class="text-gray-300 text-sm">{{ course.content|truncatewords:20 }}</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <a href="{% url 'ai_summary' course_id=course.id %}" class="bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-xs py-2 px-3 rounded-lg text-center transition-all duration-300">
+                                <i class="fas fa-robot mr-1"></i> Résumé IA
+                            </a>
+                            <a href="{% url 'ai_quiz' course_id=course.id %}" class="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 text-xs py-2 px-3 rounded-lg text-center transition-all duration-300">
+                                <i class="fas fa-brain mr-1"></i> Quiz IA
+                            </a>
+                            <a href="{% url 'ai_chat' course_id=course.id %}" class="bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 text-xs py-2 px-3 rounded-lg text-center transition-all duration-300">
+                                <i class="fas fa-comments mr-1"></i> Chat IA
+                            </a>
+                            <span class="bg-gray-500/20 text-gray-400 text-xs py-2 px-3 rounded-lg text-center cursor-not-allowed">
+                                <i class="fas fa-calendar-alt mr-1"></i> Plan IA
+                            </span>
+                        </div>
+                        
+                        <div class="text-xs text-gray-400">
+                            Créé le {{ course.created_at|date:"d/m/Y" }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-book text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Aucun cours trouvé</h3>
+                    <p class="text-gray-300 mb-6">Créez votre premier cours pour commencer à utiliser l'IA</p>
+                    <a href="{% url 'upload' %}" class="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-plus mr-2"></i>
+                        Créer un cours
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+                <h2 class="text-2xl font-bold text-white mb-6 text-center">Actions Rapides</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <a href="{% url 'upload' %}" class="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg text-center">
+                        <i class="fas fa-upload mr-2"></i>
+                        Importer un nouveau cours
+                    </a>
+                    <a href="{% url 'ai_settings' %}" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg text-center">
+                        <i class="fas fa-cog mr-2"></i>
+                        Paramètres IA
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

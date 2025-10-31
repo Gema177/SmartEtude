@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}📊 Dashboard - SmartEtude{% endblock %}
+
+{% block content %}
+<!-- Header du Dashboard -->
+<section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">
+                    🎯 Dashboard Personnel
+                </h1>
+                <p class="text-xl opacity-90">
+                    Bienvenue, {{ user.first_name|default:user.username }} ! Voici votre progression
+                </p>
+            </div>
+            <div class="hidden md:block">
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <span class="text-3xl">👤</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistiques personnelles -->
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Cours créés -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Cours Créés</p>
+                        <p class="text-3xl font-bold text-blue-600">{{ user_courses_count|default:"0" }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl text-blue-600">📚</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz générés -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Quiz Générés</p>
+                        <p class="text-3xl font-bold text-green-600">{{ user_quizzes_count|default:"0" }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl text-green-600">❓</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tentatives -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Tentatives</p>
+                        <p class="text-3xl font-bold text-purple-600">{{ user_attempts_count|default:"0" }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl text-purple-600">🎯</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score moyen -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Score Moyen</p>
+                        <p class="text-3xl font-bold text-orange-600">{{ user_average_score|default:"0" }}%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl text-orange-600">🏆</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Actions rapides -->
+<section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">
+            <span class="gradient-text">🚀</span> Actions Rapides
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Upload de cours -->
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 group">
+                <div class="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-3xl text-white">📤</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Nouveau Cours</h3>
+                <p class="text-gray-600 mb-6">
+                    Uploadez un document pour générer automatiquement des fiches et quiz
+                </p>
+                <a href="{% url 'upload' %}" class="btn-modern btn-primary-modern">
+                    <i class="fas fa-plus mr-2"></i>Commencer
+                </a>
+            </div>
+
+            <!-- Créer un quiz -->
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 group">
+                <div class="w-20 h-20 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-3xl text-white">❓</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Créer un Quiz</h3>
+                <p class="text-gray-600 mb-6">
+                    Générez des questions personnalisées pour tester vos connaissances
+                </p>
+                <a href="#" class="btn-modern btn-primary-modern">
+                    <i class="fas fa-edit mr-2"></i>Créer
+                </a>
+            </div>
+
+            <!-- Voir les statistiques -->
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 group">
+                <div class="w-20 h-20 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-3xl text-white">📊</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Analytics</h3>
+                <p class="text-gray-600 mb-6">
+                    Analysez votre progression et vos performances détaillées
+                </p>
+                <a href="#" class="btn-modern btn-primary-modern">
+                    <i class="fas fa-chart-line mr-2"></i>Voir
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cours récents -->
+{% if user_courses %}
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">
+            <span class="gradient-text">📚</span> Vos Cours Récents
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for course in user_courses %}
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <span class="text-xl text-blue-600">📖</span>
+                    </div>
+                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        {{ course.created_at|date:"d/m/Y" }}
+                    </span>
+                </div>
+                
+                <h3 class="text-lg font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+                    {{ course.title }}
+                </h3>
+                
+                {% if course.description %}
+                <p class="text-gray-600 text-sm mb-4">
+                    {{ course.description|truncatechars:100 }}
+                </p>
+                {% endif %}
+                
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <span class="flex items-center">
+                        <i class="fas fa-eye mr-1"></i>
+                        {{ course.view_count|default:"0" }} vues
+                    </span>
+                    <span class="flex items-center">
+                        <i class="fas fa-star mr-1"></i>
+                        {{ course.rating|default:"0" }}/5
+                    </span>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <i class="fas fa-arrow-right mr-1"></i>Voir le cours
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Quiz récents -->
+{% if user_quizzes %}
+<section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">
+            <span class="gradient-text">❓</span> Vos Quiz Récents
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for quiz in user_quizzes %}
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <span class="text-xl text-green-600">❓</span>
+                    </div>
+                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                        {{ quiz.created_at|date:"d/m/Y" }}
+                    </span>
+                </div>
+                
+                <h3 class="text-lg font-bold text-gray-800 mb-2 group-hover:text-green-600 transition-colors">
+                    {{ quiz.title }}
+                </h3>
+                
+                {% if quiz.description %}
+                <p class="text-gray-600 text-sm mb-4">
+                    {{ quiz.description|truncatechars:100 }}
+                </p>
+                {% endif %}
+                
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <span class="flex items-center">
+                        <i class="fas fa-question-circle mr-1"></i>
+                        {{ quiz.questions.count|default:"0" }} questions
+                    </span>
+                    <span class="flex items-center">
+                        <i class="fas fa-clock mr-1"></i>
+                        {{ quiz.time_limit|default:"0" }} min
+                    </span>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <a href="#" class="text-green-600 hover:text-green-800 text-sm font-medium">
+                        <i class="fas fa-play mr-1"></i>Commencer
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Progression et objectifs -->
+<section class="py-12 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">
+            <span class="gradient-text">🎯</span> Vos Objectifs
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Progression générale -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                <h3 class="text-xl font-bold mb-6">Progression Générale</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Compréhension</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="w-full bg-white/20 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Rétention</span>
+                            <span>60%</span>
+                        </div>
+                        <div class="w-full bg-white/20 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Application</span>
+                            <span>45%</span>
+                        </div>
+                        <div class="w-full bg-white/20 rounded-full h-2">
+                            <div class="bg-purple-500 h-2 rounded-full" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prochains objectifs -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                <h3 class="text-xl font-bold mb-6">Prochains Objectifs</h3>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-white text-sm">1</span>
+                        </div>
+                        <span class="text-sm">Compléter 5 cours</span>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-sm">2</span>
+                        </div>
+                        <span class="text-sm">Obtenir 80% sur 3 quiz</span>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-sm">3</span>
+                        </div>
+                        <span class="text-sm">Créer 2 quiz personnalisés</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Styles spécifiques -->
+<style>
+.gradient-text {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.btn-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary-modern {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+@media (max-width: 768px) {
+    .text-4xl {
+        font-size: 2rem;
+    }
+    
+    .text-3xl {
+        font-size: 1.875rem;
+    }
+}
+</style>
+{% endblock %}

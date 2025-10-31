@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Uploader un cours{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Uploader un cours</h1>
+
+{% if messages %}
+  <ul class="mb-4">
+    {% for message in messages %}
+      <li class="text-sm {% if 'success' in message.tags %}text-green-600{% else %}text-red-600{% endif %}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="space-y-4">
+  {% csrf_token %}
+  <div>
+    <label class="block text-sm font-medium mb-1" for="id_title">Titre</label>
+    {{ form.title }}
+    {{ form.title.errors }}
+  </div>
+  <div>
+    <label class="block text-sm font-medium mb-1">Fichier (PDF, TXT, DOCX ou DOC)</label>
+    {{ form.file }}
+    {{ form.file.errors }}
+  </div>
+  <button class="bg-blue-600 text-white px-4 py-2 rounded-md" type="submit">Uploader</button>
+</form>
+
+{% if form.instance and form.instance.extracted_text %}
+  <div class="mt-6">
+    <h2 class="text-lg font-semibold mb-2">Texte extrait</h2>
+    <pre class="whitespace-pre-wrap text-sm text-gray-700">{{ form.instance.extracted_text|truncatechars:2000 }}</pre>
+  </div>
+{% endif %}
+{% endblock %}
+
+

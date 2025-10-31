@@ -1,0 +1,50 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Paiement Mobile Money - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12">
+  <div class="max-w-2xl mx-auto px-4">
+    <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 text-white shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-bold">Paiement en cours</h1>
+      </div>
+
+      {% if plan %}
+      <div class="mb-4">
+        <div class="text-sm text-blue-200">Abonnement</div>
+        <div class="text-lg font-semibold">{{ plan.name }} — {{ plan.price }} {{ plan.currency }}</div>
+      </div>
+      {% endif %}
+
+      {% if error %}
+      <div class="mb-4 bg-red-500/20 border border-red-400/40 text-red-100 px-4 py-3 rounded-lg">{{ error }}</div>
+      {% endif %}
+
+      <div class="bg-white/5 rounded-xl p-4 border border-white/10 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-4 h-4 rounded-full bg-purple-400 animate-pulse"></div>
+          <div class="text-gray-200">Nous attendons la confirmation du paiement Mobile Money...</div>
+        </div>
+        <p class="text-gray-400 text-sm mt-2">Ce processus peut prendre jusqu'à 2 minutes selon l'opérateur.</p>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <a href="{% url 'billing_plans' %}" class="text-gray-300 hover:text-white underline">Changer de plan</a>
+        <a href="." class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-semibold py-2 px-4 rounded-xl">Rafraîchir le statut</a>
+      </div>
+
+      {% if payment %}
+      <div class="mt-6 text-sm text-gray-300">
+        <div>ID paiement: <span class="font-mono">{{ payment.id }}</span></div>
+        {% if payment.external_id %}
+        <div>ID partenaire: <span class="font-mono">{{ payment.external_id }}</span></div>
+        {% endif %}
+        <div>Statut: <span class="font-semibold">{{ payment.status }}</span></div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

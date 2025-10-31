@@ -1,0 +1,277 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Générer un Résumé IA - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <!-- Particules animées -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">
+                <span class="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    🤖 Résumé IA Intelligent
+                </span>
+            </h1>
+            <p class="text-gray-300 text-lg">Générez un résumé structuré avec l'intelligence artificielle</p>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Informations du cours -->
+                    <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+                        <h3 class="text-white font-semibold mb-4 flex items-center">
+                            <i class="fas fa-book mr-2 text-purple-400"></i>
+                            Informations du Cours
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-300 text-sm mb-2">Titre du cours</label>
+                                <div class="text-white font-medium">{{ course.title }}</div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm mb-2">Date de création</label>
+                                <div class="text-white">{{ course.created_at|date:"d/m/Y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Options de résumé -->
+                    <div>
+                        <h3 class="text-white font-semibold mb-4 flex items-center">
+                            <i class="fas fa-cog mr-2 text-blue-400"></i>
+                            Options de Résumé
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Niveau -->
+                            <div>
+                                <label class="block text-white font-medium mb-3">Niveau de difficulté</label>
+                                <select name="level" class="w-full bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all duration-300">
+                                    <option value="beginner" class="bg-slate-800 text-white">🌱 Débutant</option>
+                                    <option value="intermediate" class="bg-slate-800 text-white" selected>🎯 Intermédiaire</option>
+                                    <option value="advanced" class="bg-slate-800 text-white">🚀 Avancé</option>
+                                </select>
+                            </div>
+
+                            <!-- Langue -->
+                            <div>
+                                <label class="block text-white font-medium mb-3">Langue du résumé</label>
+                                <select name="language" class="w-full bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all duration-300">
+                                    <option value="french" class="bg-slate-800 text-white" selected>🇫🇷 Français (Original)</option>
+                                    <option value="english" class="bg-slate-800 text-white">🇺🇸 English (Traduction complète)</option>
+                                    <option value="spanish" class="bg-slate-800 text-white">🇪🇸 Español (Traduction partielle)</option>
+                                </select>
+                                <p class="text-gray-400 text-sm mt-2">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    L'espagnol utilise une traduction partielle (en-têtes traduits)
+                                </p>
+                            </div>
+
+
+                            <!-- Modèle IA -->
+                            <div>
+                                <label class="block text-white font-medium mb-3">Modèle IA</label>
+                                <select name="model" class="w-full bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all duration-300">
+                                    <option value="gpt-3.5-turbo" class="bg-slate-800 text-white" selected>⚡ GPT-3.5 Turbo</option>
+                                    <option value="gpt-4" class="bg-slate-800 text-white">🧠 GPT-4</option>
+                                    <option value="gpt-4o" class="bg-slate-800 text-white">🚀 GPT-4o</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aperçu du contenu -->
+                    <div>
+                        <h3 class="text-white font-semibold mb-4 flex items-center">
+                            <i class="fas fa-eye mr-2 text-green-400"></i>
+                            Aperçu du Contenu
+                        </h3>
+                        <div class="bg-white/5 rounded-xl p-6 border border-white/10 max-h-64 overflow-y-auto">
+                            <p class="text-gray-300 text-sm leading-relaxed">{{ course.extracted_text|truncatewords:100 }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <span class="flex items-center justify-center">
+                                <i class="fas fa-robot mr-2"></i>
+                                Générer le Résumé IA
+                            </span>
+                        </button>
+                        
+                        <a href="{% url 'course_detail' course_id=course.id %}" class="flex-1 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl border border-white/20 transition-all duration-300 text-center">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Retour au Cours
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Informations sur l'IA -->
+            <div class="mt-8 bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                <h3 class="text-white font-semibold mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-2 text-blue-400"></i>
+                    À propos du Résumé IA
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300">
+                    <div>
+                        <h4 class="text-white font-medium mb-2">🎯 Personnalisé</h4>
+                        <p class="text-sm">Le résumé s'adapte à votre niveau et à vos préférences linguistiques.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-medium mb-2">📊 Structuré</h4>
+                        <p class="text-sm">Organisé en sections claires avec des points clés mis en évidence.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-medium mb-2">⚡ Rapide</h4>
+                        <p class="text-sm">Génération en quelques secondes grâce à l'intelligence artificielle.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-medium mb-2">🔄 Réutilisable</h4>
+                        <p class="text-sm">Le résumé est sauvegardé et peut être modifié à tout moment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des sélecteurs
+    const levelSelect = document.querySelector('select[name="level"]');
+    const languageSelect = document.querySelector('select[name="language"]');
+    const modelSelect = document.querySelector('select[name="model"]');
+    
+    // Animation pour tous les sélecteurs
+    [levelSelect, languageSelect, modelSelect].forEach(select => {
+        if (select) {
+            select.addEventListener('change', function() {
+                // Animation de l'élément
+                this.style.transform = 'scale(1.02)';
+                this.style.borderColor = '#8B5CF6';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                    this.style.borderColor = '';
+                }, 200);
+                
+                // Afficher un message de confirmation
+                const fieldName = this.name;
+                const fieldNames = {
+                    'level': 'Niveau de difficulté',
+                    'language': 'Langue',
+                    'model': 'Modèle IA'
+                };
+                
+                showNotification(`${fieldNames[fieldName]} sélectionné: ${this.options[this.selectedIndex].text}`, 'success');
+            });
+            
+            // Effet de focus
+            select.addEventListener('focus', function() {
+                this.style.borderColor = '#8B5CF6';
+                this.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
+            });
+            
+            select.addEventListener('blur', function() {
+                this.style.borderColor = '';
+                this.style.boxShadow = '';
+            });
+        }
+    });
+    
+    // Validation du formulaire
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Animation de soumission
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Génération en cours...';
+                submitBtn.disabled = true;
+                
+                // Afficher un message de progression
+                showNotification('Génération du résumé IA en cours...', 'info');
+            }
+        });
+    }
+    
+    // Effet de survol pour les cartes d'information
+    const infoCards = document.querySelectorAll('.bg-white\\/5');
+    infoCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '';
+        });
+    });
+    
+    // Animation pour l'aperçu du contenu
+    const contentPreview = document.querySelector('.bg-white\\/5.rounded-xl.p-6');
+    if (contentPreview) {
+        contentPreview.addEventListener('click', function() {
+            this.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 200);
+        });
+    }
+});
+
+// Fonction pour afficher les notifications
+function showNotification(message, type = 'info') {
+    // Créer l'élément de notification
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full`;
+    
+    // Couleurs selon le type
+    const colors = {
+        'success': 'bg-green-500 text-white',
+        'error': 'bg-red-500 text-white',
+        'info': 'bg-blue-500 text-white',
+        'warning': 'bg-yellow-500 text-black'
+    };
+    
+    notification.className += ` ${colors[type] || colors.info}`;
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'} mr-2"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Ajouter au DOM
+    document.body.appendChild(notification);
+    
+    // Animation d'entrée
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Supprimer après 3 secondes
+    setTimeout(() => {
+        notification.style.transform = 'translateX(full)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+</script>
+{% endblock %}

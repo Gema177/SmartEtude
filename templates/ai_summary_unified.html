@@ -1,0 +1,376 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Résumé IA - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <!-- Particules animées -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">
+                <span class="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    🤖 Résumé IA Intelligent
+                </span>
+            </h1>
+            <p class="text-gray-300 text-lg">Générez un résumé structuré avec l'intelligence artificielle</p>
+        </div>
+
+        <div class="max-w-6xl mx-auto">
+            <!-- Informations du cours -->
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-8">
+                <h3 class="text-white font-semibold mb-4 flex items-center">
+                    <i class="fas fa-book mr-2 text-purple-400"></i>
+                    {{ course.title }}
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="text-gray-300">
+                        <span class="text-white font-medium">Créé le:</span> {{ course.created_at|date:"d/m/Y" }}
+                    </div>
+                    <div class="text-gray-300">
+                        <span class="text-white font-medium">Mots:</span> {{ course.extracted_text|wordcount }}
+                    </div>
+                    <div class="text-gray-300">
+                        <span class="text-white font-medium">Statut:</span> 
+                        <span class="text-green-400">✓ Prêt pour l'IA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Panneau de contrôle -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 sticky top-8">
+                        <h3 class="text-white font-semibold mb-6 flex items-center">
+                            <i class="fas fa-cog mr-2 text-blue-400"></i>
+                            Options de Génération
+                        </h3>
+
+                        <form id="summaryForm" method="post" class="space-y-6">
+                            {% csrf_token %}
+                            
+                            <!-- Type de résumé -->
+                            <div>
+                                <label class="block text-white font-medium mb-3">Type de Résumé</label>
+                                <div class="space-y-3">
+                                    <label class="flex items-center bg-white/5 rounded-xl p-4 border border-white/20 hover:bg-white/10 transition-all duration-300 cursor-pointer">
+                                        <input type="radio" name="summary_type" value="simple" checked class="mr-3 text-purple-400 focus:ring-purple-400">
+                                        <div>
+                                            <div class="text-white font-medium">📝 Résumé Simple</div>
+                                            <div class="text-gray-300 text-sm">Résumé basique sans IA</div>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="flex items-center bg-white/5 rounded-xl p-4 border border-white/20 hover:bg-white/10 transition-all duration-300 cursor-pointer">
+                                        <input type="radio" name="summary_type" value="ai" class="mr-3 text-purple-400 focus:ring-purple-400">
+                                        <div>
+                                            <div class="text-white font-medium">🤖 Résumé IA</div>
+                                            <div class="text-gray-300 text-sm">Résumé intelligent avec ChatGPT</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Options IA (masquées par défaut) -->
+                            <div id="aiOptions" class="space-y-4 hidden">
+                                <!-- Langue -->
+                                <div>
+                                    <label class="block text-white font-medium mb-3">Langue du Résumé</label>
+                                    <select name="language" class="w-full bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all duration-300">
+                                        <option value="french" selected>🇫🇷 Français (Original)</option>
+                                        <option value="english">🇺🇸 English (Traduction complète)</option>
+                                        <option value="spanish">🇪🇸 Español (Traduction partielle)</option>
+                                    </select>
+                                    <p class="text-gray-400 text-sm mt-2">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        L'espagnol utilise une traduction partielle (en-têtes traduits)
+                                    </p>
+                                </div>
+
+                                <!-- Modèle IA -->
+                                <div>
+                                    <label class="block text-white font-medium mb-3">Modèle IA</label>
+                                    <select name="model" class="w-full bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all duration-300">
+                                        <option value="gpt-3.5-turbo" selected>⚡ GPT-3.5 Turbo (Rapide)</option>
+                                        <option value="gpt-4">🧠 GPT-4 (Plus intelligent)</option>
+                                        <option value="gpt-4o">🚀 GPT-4o (Optimisé)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Niveau -->
+                                <div>
+                                    <label class="block text-white font-medium mb-3">Niveau de Difficulté</label>
+                                    <select name="level" class="w-full bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all duration-300">
+                                        <option value="beginner">🌱 Débutant</option>
+                                        <option value="intermediate" selected>🎯 Intermédiaire</option>
+                                        <option value="advanced">🚀 Avancé</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <!-- Bouton de génération -->
+                            <button type="submit" class="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                <i class="fas fa-magic mr-2"></i>
+                                <span id="generateText">Générer le Résumé</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Zone de résultat -->
+                <div class="lg:col-span-2">
+                    <div id="resultArea" class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 min-h-96">
+                        <!-- État initial -->
+                        <div id="initialState" class="text-center py-16">
+                            <div class="w-24 h-24 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i class="fas fa-robot text-purple-400 text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-4">Prêt à Générer un Résumé</h3>
+                            <p class="text-gray-300 mb-6">Configurez vos options et cliquez sur "Générer le Résumé" pour commencer.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-green-400 mr-2"></i>
+                                    <span>Résumé simple rapide</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-green-400 mr-2"></i>
+                                    <span>Résumé IA intelligent</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-green-400 mr-2"></i>
+                                    <span>12 langues disponibles</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-green-400 mr-2"></i>
+                                    <span>3 modèles GPT</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- État de chargement -->
+                        <div id="loadingState" class="text-center py-16 hidden">
+                            <div class="w-24 h-24 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i class="fas fa-spinner fa-spin text-purple-400 text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-4">Génération en Cours...</h3>
+                            <p class="text-gray-300 mb-6" id="loadingText">Analyse du contenu et génération du résumé...</p>
+                            <div class="w-full bg-white/10 rounded-full h-2 mb-4">
+                                <div id="progressBar" class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <p class="text-gray-400 text-sm" id="progressText">0%</p>
+                        </div>
+
+                        <!-- Résultat -->
+                        <div id="resultState" class="hidden">
+                            <!-- Le contenu sera injecté ici par JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+<script>
+// Restauration du flux AJAX professionnel
+(function() {
+    const form = document.getElementById('summaryForm');
+    const resultArea = document.getElementById('resultArea');
+    const initialState = document.getElementById('initialState');
+    const loadingStateId = 'loadingStateInline';
+
+    function showLoading() {
+        initialState && initialState.classList.add('hidden');
+        // Crée un mini état de chargement inline
+        let loading = document.getElementById(loadingStateId);
+        if (!loading) {
+            loading = document.createElement('div');
+            loading.id = loadingStateId;
+            loading.className = 'text-center py-10';
+            loading.innerHTML = '<div class="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-spinner fa-spin text-purple-400 text-2xl"></i></div><p class="text-gray-300">Génération du résumé...</p>';
+            resultArea.innerHTML = '';
+            resultArea.appendChild(loading);
+        }
+    }
+
+    function hideLoading() {
+        const loading = document.getElementById(loadingStateId);
+        if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+    }
+
+    // Simple, safe Markdown → HTML (headings, bold, italic, lists, paragraphs)
+    function markdownToHtml(md) {
+        if (!md) return '';
+        const escapeHtml = (s) => s
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        const src = escapeHtml(md);
+        const lines = src.split(/\r?\n/);
+        let htmlParts = [];
+        let inUl = false, inOl = false, inBlockquote = false;
+        const closeLists = () => {
+            if (inUl) { htmlParts.push('</ul>'); inUl = false; }
+            if (inOl) { htmlParts.push('</ol>'); inOl = false; }
+        };
+        const closeBlockquote = () => { if (inBlockquote) { htmlParts.push('</blockquote>'); inBlockquote = false; } };
+        for (let raw of lines) {
+            const line = raw.trimEnd();
+            if (!line.trim()) {
+                closeLists();
+                closeBlockquote();
+                htmlParts.push('');
+                continue;
+            }
+            let m;
+            if ((m = line.match(/^######\s+(.*)$/))) { closeLists(); closeBlockquote(); htmlParts.push(`<h6>${m[1]}</h6>`); continue; }
+            if ((m = line.match(/^#####\s+(.*)$/))) { closeLists(); closeBlockquote(); htmlParts.push(`<h5>${m[1]}</h5>`); continue; }
+            if ((m = line.match(/^####\s+(.*)$/)))  { closeLists(); closeBlockquote(); htmlParts.push(`<h4>${m[1]}</h4>`); continue; }
+            if ((m = line.match(/^###\s+(.*)$/)))   { closeLists(); closeBlockquote(); htmlParts.push(`<h3>${m[1]}</h3>`); continue; }
+            if ((m = line.match(/^##\s+(.*)$/)))    { closeLists(); closeBlockquote(); htmlParts.push(`<h2>${m[1]}</h2>`); continue; }
+            if ((m = line.match(/^#\s+(.*)$/)))     { closeLists(); closeBlockquote(); htmlParts.push(`<h1>${m[1]}</h1>`); continue; }
+
+            if ((m = line.match(/^>\s+(.*)$/))) {
+                closeLists();
+                if (!inBlockquote) { htmlParts.push('<blockquote>'); inBlockquote = true; }
+                htmlParts.push(`<p>${m[1]}</p>`);
+                continue;
+            }
+
+            if ((m = line.match(/^[-*+]\s+(.*)$/))) {
+                closeBlockquote();
+                if (inOl) { htmlParts.push('</ol>'); inOl = false; }
+                if (!inUl) { htmlParts.push('<ul>'); inUl = true; }
+                htmlParts.push(`<li>${m[1]}</li>`);
+                continue;
+            }
+            if ((m = line.match(/^\d+\.\s+(.*)$/))) {
+                closeBlockquote();
+                if (inUl) { htmlParts.push('</ul>'); inUl = false; }
+                if (!inOl) { htmlParts.push('<ol>'); inOl = true; }
+                htmlParts.push(`<li>${m[1]}</li>`);
+                continue;
+            }
+
+            // Bold and italics inside regular paragraphs
+            let paragraph = line
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>');
+            closeLists();
+            closeBlockquote();
+            htmlParts.push(`<p>${paragraph}</p>`);
+        }
+        closeLists();
+        closeBlockquote();
+        return htmlParts.join('\n');
+    }
+
+    function renderSummary(summary, meta) {
+        hideLoading();
+        const container = document.createElement('div');
+        container.className = 'space-y-6 text-white';
+
+        const block = document.createElement('div');
+        block.className = 'bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20';
+        const title = document.createElement('h3');
+        title.className = 'text-white font-semibold mb-4 flex items-center';
+        title.innerHTML = '<i class="fas fa-file-text mr-2 text-purple-400"></i>Résumé';
+
+        const content = document.createElement('div');
+        content.className = 'prose prose-invert max-w-none text-white summary-content';
+        content.innerHTML = markdownToHtml(summary);
+
+        // Post-styling for better UI without typography plugin config
+        const root = content;
+        root.querySelectorAll('h1,h2,h3').forEach(el => {
+            el.className = 'text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-blue-300 bg-clip-text text-transparent mb-4';
+        });
+        root.querySelectorAll('h4,h5,h6').forEach(el => {
+            el.className = 'text-xl font-bold text-white mb-3';
+        });
+        root.querySelectorAll('p').forEach(el => {
+            el.classList.add('text-gray-200','leading-relaxed','mb-3');
+        });
+        root.querySelectorAll('ul').forEach(el => {
+            el.classList.add('list-disc','list-inside','space-y-1','mb-3');
+        });
+        root.querySelectorAll('ol').forEach(el => {
+            el.classList.add('list-decimal','list-inside','space-y-1','mb-3');
+        });
+        root.querySelectorAll('li').forEach(el => {
+            el.classList.add('text-gray-200');
+        });
+        root.querySelectorAll('blockquote').forEach(el => {
+            el.className = 'border-l-4 border-purple-400/50 pl-4 text-purple-200 italic mb-4';
+        });
+ 
+        block.appendChild(title);
+        block.appendChild(content);
+        container.appendChild(block);
+
+        if (meta && meta.fallback) {
+            const note = document.createElement('div');
+            note.className = 'bg-yellow-500/10 border border-yellow-400/30 text-yellow-300 rounded-xl p-4';
+            note.textContent = "Résumé IA indisponible. Affichage d'un résumé local simplifié.";
+            container.appendChild(note);
+        }
+
+        resultArea.innerHTML = '';
+        resultArea.appendChild(container);
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        showLoading();
+
+        const data = {
+            summary_type: 'ai', // valeur par défaut
+            csrfmiddlewaretoken: form.querySelector('input[name="csrfmiddlewaretoken"]').value,
+            language: form.querySelector('select[name="language"]')?.value || 'french',
+            model: form.querySelector('select[name="model"]')?.value || 'gpt-3.5-turbo',
+            level: form.querySelector('select[name="level"]')?.value || 'intermediate'
+        };
+
+        fetch(`/ai/course/{{ course.id }}/summary/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': data.csrfmiddlewaretoken
+            },
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success && res.summary) {
+                renderSummary(res.summary, { fallback: !!res.fallback });
+            } else {
+                hideLoading();
+                resultArea.innerHTML = '<div class="text-center py-12"><div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i></div><p class="text-gray-300">Erreur lors de la génération du résumé.</p></div>';
+            }
+        })
+        .catch(() => {
+            hideLoading();
+            resultArea.innerHTML = '<div class="text-center py-12"><div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i></div><p class="text-gray-300">Erreur réseau pendant la génération.</p></div>';
+        });
+    });
+})();
+</script>
+
+<style>
+/* Marker color for lists inside summary content */
+.summary-content li::marker { color: #5eead4; }
+.summary-content h1 + p,
+.summary-content h2 + p,
+.summary-content h3 + p { margin-top: 0.25rem; }
+</style>

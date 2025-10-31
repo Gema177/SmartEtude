@@ -1,0 +1,517 @@
+{% extends 'base_tailwind.html' %}
+
+{% block title %}Tableau de bord - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-emerald-900 relative overflow-hidden">
+    <!-- Particules animées en arrière-plan -->
+    <div class="absolute inset-0">
+        <div class="particle" style="--delay: 0s; --x: 10%;"></div>
+        <div class="particle" style="--delay: 2s; --x: 25%;"></div>
+        <div class="particle" style="--delay: 4s; --x: 45%;"></div>
+        <div class="particle" style="--delay: 6s; --x: 65%;"></div>
+        <div class="particle" style="--delay: 8s; --x: 85%;"></div>
+        <div class="particle" style="--delay: 10s; --x: 95%;"></div>
+    </div>
+
+    <!-- Formes géométriques tech -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-20 w-72 h-72 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-full blur-3xl animate-float-delayed"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+    </div>
+
+    <!-- Grille tech -->
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+
+    <div class="relative z-10 min-h-screen">
+        <!-- Header du dashboard -->
+        <header class="glass-card mx-4 mt-4 p-6 rounded-3xl backdrop-blur-2xl border border-white/20 shadow-2xl">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                    <div class="relative">
+                        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                            <i class="fas fa-chart-line text-2xl text-white"></i>
+                        </div>
+                        <div class="absolute inset-0 w-16 h-16 border-2 border-green-400/30 rounded-2xl animate-spin-slow"></div>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold">
+                            <span class="bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                                Tableau de bord
+                            </span>
+                        </h1>
+                        <p class="text-gray-300">Bienvenue, {{ user.username }} !</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'create_course' %}" class="action-btn-primary">
+                        <i class="fas fa-plus mr-2"></i>
+                        Créer un Cours
+                    </a>
+                    <div class="relative">
+                        <button class="user-menu-btn">
+                            <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenu principal -->
+        <div class="p-4 space-y-6">
+            <!-- Statistiques principales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="glass-card p-6 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-300 text-sm font-medium">Cours créés</p>
+                            <p class="text-3xl font-bold text-green-400">{{ user_courses_count|default:0 }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-book text-green-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-300 text-sm font-medium">Quiz disponibles</p>
+                            <p class="text-3xl font-bold text-emerald-400">{{ user_quizzes_count|default:0 }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-question-circle text-emerald-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-300 text-sm font-medium">Tentatives</p>
+                            <p class="text-3xl font-bold text-teal-400">{{ user_attempts_count|default:0 }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-br from-teal-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-trophy text-teal-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-300 text-sm font-medium">Score moyen</p>
+                            <p class="text-3xl font-bold text-cyan-400">{{ user_average_score|default:75 }}%</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-chart-bar text-cyan-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu principal en 2 colonnes -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Cours récents -->
+                <div class="lg:col-span-2">
+                    <div class="glass-card p-6 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-white flex items-center">
+                                <i class="fas fa-book-open text-green-400 mr-3"></i>
+                                Cours récents
+                            </h2>
+                            <a href="#" class="text-green-400 hover:text-green-300 text-sm font-medium hover:underline">
+                                Voir tout
+                            </a>
+                        </div>
+                        
+                        {% if user_courses %}
+                            <div class="space-y-4">
+                                {% for course in user_courses %}
+                                <div class="course-card">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center">
+                                            <i class="fas fa-file-pdf text-green-400"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-white font-medium">{{ course.title }}</h3>
+                                            <p class="text-gray-400 text-sm">{{ course.description|truncatechars:60|default:"Aucune description" }}</p>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="status-badge {% if course.is_public %}public{% else %}private{% endif %}">
+                                                {% if course.is_public %}Public{% else %}Privé{% endif %}
+                                            </span>
+                                            <a href="{% url 'course_detail' course_id=course.id %}" class="action-btn-secondary" title="Voir le cours">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'delete_course' course_id=course.id %}" class="action-btn-danger" title="Supprimer le cours">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <div class="w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-plus text-green-400 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-400 text-center mb-4">Aucun cours créé pour le moment</p>
+                                <a href="{% url 'upload' %}" class="action-btn-primary mx-auto">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Créer votre premier cours
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Activité récente -->
+                <div class="lg:col-span-1">
+                    <div class="glass-card p-6 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl">
+                        <h2 class="text-xl font-bold text-white mb-6 flex items-center">
+                            <i class="fas fa-activity text-green-400 mr-3"></i>
+                            Activité récente
+                        </h2>
+                        
+                        <div class="space-y-4">
+                            <div class="activity-item">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                    <div class="flex-1">
+                                        <p class="text-white text-sm">Nouveau cours créé</p>
+                                        <p class="text-gray-400 text-xs">Il y a 2 heures</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                                    <div class="flex-1">
+                                        <p class="text-white text-sm">Quiz terminé</p>
+                                        <p class="text-gray-400 text-xs">Score: 85%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-2 h-2 bg-teal-400 rounded-full"></div>
+                                    <div class="flex-1">
+                                        <p class="text-white text-sm">Profil mis à jour</p>
+                                        <p class="text-gray-400 text-xs">Il y a 1 jour</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions rapides -->
+                    <div class="glass-card p-6 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl mt-6">
+                        <h3 class="text-lg font-bold text-white mb-4">Actions rapides</h3>
+                        <div class="space-y-3">
+                            <a href="{% url 'upload' %}" class="quick-action-btn">
+                                <i class="fas fa-upload text-green-400"></i>
+                                <span>Importer un cours</span>
+                            </a>
+                            <a href="{% url 'ai_dashboard' %}" class="quick-action-btn">
+                                <i class="fas fa-robot text-purple-400"></i>
+                                <span>Assistant IA</span>
+                            </a>
+                            <a href="#" class="quick-action-btn">
+                                <i class="fas fa-question-circle text-emerald-400"></i>
+                                <span>Créer un quiz</span>
+                            </a>
+                            <a href="#" class="quick-action-btn">
+                                <i class="fas fa-chart-line text-teal-400"></i>
+                                <span>Voir les statistiques</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progression et objectifs -->
+            <div class="glass-card p-6 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl">
+                <h2 class="text-xl font-bold text-white mb-6 flex items-center">
+                    <i class="fas fa-target text-green-400 mr-3"></i>
+                    Progression et objectifs
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="progress-card">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-gray-300 text-sm">Objectif: 10 cours</span>
+                            <span class="text-green-400 font-medium">{{ user_courses_count|default:0 }}/10</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {% widthratio user_courses_count|default:0 10 100 %}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-card">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-gray-300 text-sm">Objectif: Score 90%</span>
+                            <span class="text-emerald-400 font-medium">{{ user_average_score|default:75 }}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ user_average_score|default:75 }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-card">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-gray-300 text-sm">Objectif: 50 tentatives</span>
+                            <span class="text-teal-400 font-medium">{{ user_attempts_count|default:0 }}/50</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {% widthratio user_attempts_count|default:0 50 100 %}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .particle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: linear-gradient(45deg, #10b981, #059669);
+        border-radius: 50%;
+        animation: float-up 30s linear infinite;
+        animation-delay: var(--delay);
+        left: var(--x);
+        opacity: 0.7;
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+
+    @keyframes float-up {
+        0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+        10% { opacity: 0.7; }
+        90% { opacity: 0.7; }
+        100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    @keyframes float-delayed {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(20px) rotate(-180deg); }
+    }
+
+    .animate-float { animation: float 8s ease-in-out infinite; }
+    .animate-float-delayed { animation: float-delayed 10s ease-in-out infinite; }
+    .animate-spin-slow { animation: spin 20s linear infinite; }
+    .animate-pulse-slow { animation: pulse 4s ease-in-out infinite; }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(25px);
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .action-btn-primary {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #10b981, #059669, #047857);
+        color: white;
+        text-decoration: none;
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        transform: translateY(0);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .action-btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .action-btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .action-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4);
+        color: white;
+    }
+
+    .action-btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #e2e8f0;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #10b981;
+        color: #10b981;
+        transform: translateY(-1px);
+    }
+
+    .action-btn-danger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .action-btn-danger:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        color: white;
+    }
+
+    .user-menu-btn {
+        transition: all 0.3s ease;
+    }
+
+    .user-menu-btn:hover {
+        transform: scale(1.05);
+    }
+
+    .course-card {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .course-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(16, 185, 129, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .status-badge.public {
+        background: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge.private {
+        background: rgba(156, 163, 175, 0.2);
+        color: #9ca3af;
+        border: 1px solid rgba(156, 163, 175, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .activity-item {
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .activity-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateX(4px);
+    }
+
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        color: #e2e8f0;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .quick-action-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(16, 185, 129, 0.3);
+        border-color: rgba(16, 185, 129, 0.3);
+        transform: translateY(-1px);
+    }
+
+    .quick-action-btn i {
+        margin-right: 0.75rem;
+        font-size: 1.125rem;
+    }
+
+    .progress-card {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 1rem;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 0.25rem;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #10b981, #059669);
+        border-radius: 0.25rem;
+        transition: width 0.5s ease;
+    }
+
+    @media (max-width: 768px) {
+        .glass-card { margin: 0.5rem; }
+        .grid { grid-template-columns: 1fr; }
+        .header { flex-direction: column; text-align: center; }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - Fiches de Révision{% endblock %}
+
+{% block content %}
+<div class="text-center mb-8">
+    <h1 class="text-4xl font-bold mb-4">📚 Fiches de Révision</h1>
+    <p class="text-xl text-gray-600 mb-2">Plateforme intelligente d'apprentissage</p>
+    <p class="text-gray-500">Générez automatiquement des fiches de révision et des quiz à partir de vos cours</p>
+</div>
+
+<!-- Statistiques globales -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-blue-50 p-6 rounded-lg text-center">
+        <div class="text-3xl font-bold text-blue-600">{{ stats.total_courses }}</div>
+        <div class="text-gray-600">Cours publics</div>
+    </div>
+    <div class="bg-green-50 p-6 rounded-lg text-center">
+        <div class="text-3xl font-bold text-green-600">{{ stats.total_quizzes }}</div>
+        <div class="text-gray-600">Quiz disponibles</div>
+    </div>
+    <div class="bg-purple-50 p-6 rounded-lg text-center">
+        <div class="text-3xl font-bold text-purple-600">{{ stats.total_attempts }}</div>
+        <div class="text-gray-600">Tentatives</div>
+    </div>
+</div>
+
+<!-- Actions principales -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    {% if user.is_authenticated %}
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg">
+            <h2 class="text-xl font-semibold mb-3">🎯 Mon Tableau de bord</h2>
+            <p class="mb-4">Accédez à vos cours, quiz et statistiques personnelles</p>
+            <a href="{% url 'dashboard' %}" class="bg-white text-blue-600 px-4 py-2 rounded font-semibold hover:bg-gray-100">
+                Accéder au tableau de bord
+            </a>
+        </div>
+        
+        <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg">
+            <h2 class="text-xl font-semibold mb-3">📁 Uploader un cours</h2>
+            <p class="mb-4">Ajoutez un nouveau document pour créer des fiches et quiz</p>
+            <a href="{% url 'upload' %}" class="bg-white text-green-600 px-4 py-2 rounded font-semibold hover:bg-gray-100">
+                Commencer l'upload
+            </a>
+        </div>
+    {% else %}
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg">
+            <h2 class="text-xl font-semibold mb-3">🚀 Commencer</h2>
+            <p class="mb-4">Créez un compte pour accéder à toutes les fonctionnalités</p>
+            <a href="{% url 'register' %}" class="bg-white text-blue-600 px-4 py-2 rounded font-semibold hover:bg-gray-100">
+                Créer un compte
+            </a>
+        </div>
+        
+        <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg">
+            <h2 class="text-xl font-semibold mb-3">🔐 Se connecter</h2>
+            <p class="mb-4">Accédez à votre espace personnel</p>
+            <a href="{% url 'login' %}" class="bg-white text-green-600 px-4 py-2 rounded font-semibold hover:bg-gray-100">
+                Se connecter
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Cours publics récents -->
+{% if recent_courses %}
+<div class="bg-white border border-gray-200 rounded-lg p-6">
+    <h2 class="text-xl font-semibold mb-4">📖 Cours publics récents</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for course in recent_courses %}
+        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <h3 class="font-semibold mb-2">{{ course.title }}</h3>
+            {% if course.description %}
+                <p class="text-sm text-gray-600 mb-2">{{ course.description|truncatechars:100 }}</p>
+            {% endif %}
+            <div class="flex items-center justify-between text-sm text-gray-500">
+                <span>Par {{ course.user.first_name|default:course.user.username }}</span>
+                <span>{{ course.created_at|date:"d/m/Y" }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Fonctionnalités -->
+<div class="mt-8 bg-gray-50 p-6 rounded-lg">
+    <h2 class="text-xl font-semibold mb-4 text-center">✨ Fonctionnalités</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-center">
+            <div class="text-3xl mb-2">📄</div>
+            <h3 class="font-semibold mb-2">Extraction de texte</h3>
+            <p class="text-sm text-gray-600">Extraction automatique du contenu des PDF et fichiers texte</p>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl mb-2">📝</div>
+            <h3 class="font-semibold mb-2">Résumés intelligents</h3>
+            <p class="text-sm text-gray-600">Génération automatique de fiches de révision</p>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl mb-2">🎯</div>
+            <h3 class="font-semibold mb-2">Quiz adaptatifs</h3>
+            <p class="text-sm text-gray-600">Création de questions Vrai/Faux et QCM</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

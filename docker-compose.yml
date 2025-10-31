@@ -1,0 +1,328 @@
+# =============================================================================
+# DOCKER COMPOSE - SMARTETUDE
+# =============================================================================
+# Configuration complète pour le déploiement en production
+
+version: '3.8'
+
+# =============================================================================
+# SERVICES PRINCIPAUX
+# =============================================================================
+
+services:
+  # =====================================================================
+  # BASE DE DONNÉES POSTGRESQL
+  # =====================================================================
+  db:
+    image: postgres:15-alpine
+    container_name: fiches_revision_db
+    environment:
+      POSTGRES_DB: fiches_revision
+      POSTGRES_USER: fiches_user
+      POSTGRES_PASSWORD: fiches_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - fiches_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fiches_user -d fiches_revision"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # =====================================================================
+  # CACHE ET MESSAGE BROKER REDIS
+  # =====================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: fiches_revision_redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fiches_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # =====================================================================
+  # APPLICATION DJANGO PRINCIPALE
+  # =====================================================================
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: fiches_revision_web
+    command: >
+      gunicorn fiches_revision.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 4
+      --worker-class gevent
+      --worker-connections 1000
+      --max-requests 1000
+      --max-requests-jitter 100
+      --timeout 30
+      --keep-alive 2
+      --preload
+      --access-logfile -
+      --error-logfile -
+      --log-level info
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+      - ./logs:/app/logs
+    ports:
+      - "8000:8000"
+    environment:
+      # Configuration Django
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-xxl-project-2024}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      
+      # Configuration base de données
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=fiches_revision
+      - DB_USER=fiches_user
+      - DB_PASSWORD=fiches_password
+      - DB_HOST=db
+      - DB_PORT=5432
+      
+      # Configuration Redis et cache
+      - REDIS_URL=redis://redis:6379/1
+      - CACHE_BACKEND=django.core.cache.backends.redis.RedisCache
+      
+      # Configuration Celery
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=django-db
+      
+      # Configuration IA (OpenAI)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com}
+      - AI_MODEL=${AI_MODEL:-gpt-4o-mini}
+      - AI_MAX_TOKENS=${AI_MAX_TOKENS:-800}
+      
+      # Configuration monitoring
+      - SENTRY_DSN=${SENTRY_DSN}
+      
+      # Configuration production
+      - SECURE_SSL_REDIRECT=False
+      - SESSION_COOKIE_SECURE=False
+      - CSRF_COOKIE_SECURE=False
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fiches_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  # =====================================================================
+  # WORKER CELERY POUR LE TRAITEMENT ASYNCHRONE
+  # =====================================================================
+  celery:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: fiches_revision_celery
+    command: >
+      celery -A fiches_revision worker
+      --loglevel=info
+      --concurrency=4
+      --max-tasks-per-child=1000
+      --max-memory-per-child=512000
+      --prefetch-multiplier=1
+      --without-gossip
+      --without-mingle
+      --without-heartbeat
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    environment:
+      # Configuration Django
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-xxl-project-2024}
+      
+      # Configuration base de données
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=fiches_revision
+      - DB_USER=fiches_user
+      - DB_PASSWORD=fiches_password
+      - DB_HOST=db
+      - DB_PORT=5432
+      
+      # Configuration Redis et cache
+      - REDIS_URL=redis://redis:6379/1
+      - CACHE_BACKEND=django.core.cache.backends.redis.RedisCache
+      
+      # Configuration Celery
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=django-db
+      
+      # Configuration IA (OpenAI)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com}
+      - AI_MODEL=${AI_MODEL:-gpt-4o-mini}
+      - AI_MAX_TOKENS=${AI_MAX_TOKENS:-800}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fiches_network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # =====================================================================
+  # BEAT CELERY POUR LES TÂCHES PLANIFIÉES
+  # =====================================================================
+  celery-beat:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: fiches_revision_celery_beat
+    command: >
+      celery -A fiches_revision beat
+      --loglevel=info
+      --scheduler django_celery_beat.schedulers:DatabaseScheduler
+      --pidfile=/tmp/celerybeat.pid
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    environment:
+      # Configuration Django
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-xxl-project-2024}
+      
+      # Configuration base de données
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=fiches_revision
+      - DB_USER=fiches_user
+      - DB_PASSWORD=fiches_password
+      - DB_HOST=db
+      - DB_PORT=5432
+      
+      # Configuration Redis et cache
+      - REDIS_URL=redis://redis:6379/1
+      - CACHE_BACKEND=django.core.cache.backends.redis.RedisCache
+      
+      # Configuration Celery
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=django-db
+      
+      # Configuration IA (OpenAI)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com}
+      - AI_MODEL=${AI_MODEL:-gpt-4o-mini}
+      - AI_MAX_TOKENS=${AI_MAX_TOKENS:-800}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fiches_network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # =====================================================================
+  # NGINX POUR LE REVERSE PROXY ET LES FICHIERS STATIQUES
+  # =====================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: fiches_revision_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web
+    networks:
+      - fiches_network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+# =============================================================================
+# VOLUMES PERSISTANTS
+# =============================================================================
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
+
+# =============================================================================
+# RÉSEAUX
+# =============================================================================
+
+networks:
+  fiches_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

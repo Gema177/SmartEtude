@@ -1,0 +1,187 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Résumé IA Généré - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <!-- Particules animées -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">
+                <span class="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    🤖 Résumé IA Généré
+                </span>
+            </h1>
+            <p class="text-gray-300 text-lg">Votre résumé intelligent est prêt !</p>
+        </div>
+
+        <!-- Résultat -->
+        <div class="max-w-6xl mx-auto">
+            {% if success %}
+                <!-- Résumé généré avec succès -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl mb-8">
+                    <!-- Informations du résumé -->
+                    <div class="flex flex-wrap items-center justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-robot text-purple-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-white font-bold text-xl">{{ course.title }}</h2>
+                                <p class="text-gray-300 text-sm">Résumé généré avec {{ model_used }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm">
+                                <i class="fas fa-check mr-1"></i>
+                                Généré avec succès
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Métadonnées -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                            <div class="text-2xl font-bold text-purple-400">{{ summary_data.word_count|default:"N/A" }}</div>
+                            <div class="text-gray-300 text-sm">Mots</div>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                            <div class="text-2xl font-bold text-blue-400">{{ summary_data.reading_time|default:"N/A" }}</div>
+                            <div class="text-gray-300 text-sm">Min de lecture</div>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                            <div class="text-2xl font-bold text-green-400">{{ summary_data.difficulty|default:"N/A" }}</div>
+                            <div class="text-gray-300 text-sm">Niveau</div>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+                            <div class="text-2xl font-bold text-yellow-400">{{ summary_data.language|default:"N/A" }}</div>
+                            <div class="text-gray-300 text-sm">Langue</div>
+                        </div>
+                    </div>
+
+                    <!-- Contenu du résumé -->
+                    <div class="space-y-6">
+                        <!-- Résumé principal -->
+                        <div>
+                            <h3 class="text-white font-semibold mb-4 flex items-center">
+                                <i class="fas fa-file-text mr-2 text-purple-400"></i>
+                                Résumé Principal
+                            </h3>
+                            <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+                                <div class="prose prose-invert prose-headings:bg-gradient-to-r prose-headings:from-purple-400 prose-headings:to-blue-300 prose-headings:bg-clip-text prose-headings:text-transparent max-w-none">
+                                    {{ summary_data.summary_html|safe }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Points clés -->
+                        {% if summary_data.key_points %}
+                        <div>
+                            <h3 class="text-white font-semibold mb-4 flex items-center">
+                                <i class="fas fa-key mr-2 text-blue-400"></i>
+                                Points Clés
+                            </h3>
+                            <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+                                <ul class="space-y-2">
+                                    {% for point in summary_data.key_points %}
+                                    <li class="flex items-start">
+                                        <i class="fas fa-chevron-right text-purple-400 mr-3 mt-1 text-sm"></i>
+                                        <span class="text-gray-300">{{ point }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Concepts importants -->
+                        {% if summary_data.important_concepts %}
+                        <div>
+                            <h3 class="text-white font-semibold mb-4 flex items-center">
+                                <i class="fas fa-lightbulb mr-2 text-yellow-400"></i>
+                                Concepts Importants
+                            </h3>
+                            <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+                                <div class="flex flex-wrap gap-2">
+                                    {% for concept in summary_data.important_concepts %}
+                                    <span class="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm">
+                                        {{ concept }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Recommandations -->
+                        {% if summary_data.recommendations %}
+                        <div>
+                            <h3 class="text-white font-semibold mb-4 flex items-center">
+                                <i class="fas fa-star mr-2 text-green-400"></i>
+                                Recommandations
+                            </h3>
+                            <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+                                <ul class="space-y-2">
+                                    {% for rec in summary_data.recommendations %}
+                                    <li class="flex items-start">
+                                        <i class="fas fa-arrow-right text-green-400 mr-3 mt-1 text-sm"></i>
+                                        <span class="text-gray-300">{{ rec }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% else %}
+                <!-- Erreur ou fallback -->
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl mb-8">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i>
+                        </div>
+                        <h2 class="text-white font-bold text-xl mb-2">Erreur de Génération</h2>
+                        <p class="text-gray-300 mb-6">{{ error_message|default:"Une erreur est survenue lors de la génération du résumé." }}</p>
+                        
+                        {% if fallback_summary %}
+                        <div class="bg-white/5 rounded-xl p-6 border border-white/10 text-left">
+                            <h3 class="text-white font-semibold mb-4">Résumé de Secours</h3>
+                            <p class="text-gray-300 leading-relaxed">{{ fallback_summary }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                {% if success %}
+                <a href="{% url 'ai_summary' course_id=course.id %}" class="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg text-center">
+                    <i class="fas fa-redo mr-2"></i>
+                    Régénérer le Résumé
+                </a>
+                {% endif %}
+                
+                <a href="{% url 'ai_quiz' course_id=course.id %}" class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg text-center">
+                    <i class="fas fa-brain mr-2"></i>
+                    Créer un Quiz IA
+                </a>
+                
+                <a href="{% url 'course_detail' course_id=course.id %}" class="flex-1 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl border border-white/20 transition-all duration-300 text-center">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Retour au Cours
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

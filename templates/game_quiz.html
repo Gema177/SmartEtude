@@ -1,0 +1,414 @@
+{% extends 'base_tailwind.html' %}
+
+{% block title %}Quiz - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-emerald-900 relative overflow-hidden">
+    <!-- Particules animées en arrière-plan -->
+    <div class="absolute inset-0">
+        <div class="particle" style="--delay: 0s; --x: 10%;"></div>
+        <div class="particle" style="--delay: 2s; --x: 25%;"></div>
+        <div class="particle" style="--delay: 4s; --x: 45%;"></div>
+        <div class="particle" style="--delay: 6s; --x: 65%;"></div>
+        <div class="particle" style="--delay: 8s; --x: 85%;"></div>
+    </div>
+
+    <!-- Formes géométriques tech -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-20 w-80 h-80 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- Grille tech -->
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+
+    <div class="relative z-10 min-h-screen">
+        <!-- Header -->
+        <header class="pt-20 pb-16 px-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="glass-card p-8 rounded-3xl backdrop-blur-2xl border border-white/20 shadow-2xl">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                            <div class="relative">
+                                <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                                    <i class="fas fa-gamepad text-2xl text-white"></i>
+                                </div>
+                                <div class="absolute inset-0 w-16 h-16 border-2 border-emerald-400/30 rounded-2xl"></div>
+                            </div>
+                            <div>
+                                <h1 class="text-3xl font-bold text-white mb-2">{{ quiz.title }}</h1>
+                                <p class="text-gray-300">{{ questions_data|length }} questions • Mode Jeu</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-emerald-400" id="question-counter">1</div>
+                                <div class="text-sm text-gray-400">Question</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-400" id="score-counter">0</div>
+                                <div class="text-sm text-gray-400">Score</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Quiz Form -->
+        <div class="px-4 pb-20">
+            <div class="max-w-4xl mx-auto">
+                <form method="post" class="space-y-8" id="quiz-form">
+                    {% csrf_token %}
+
+                    <div id="question-container" class="space-y-8">
+                        {% for question_data in questions_data %}
+                        <div class="question-slide {% if forloop.first %}active{% else %}hidden{% endif %}"
+                             data-question="{{ forloop.counter0 }}"
+                             data-correct="{{ question_data.correct_answer_index }}">
+
+                            <!-- Question -->
+                            <div class="glass-card p-8 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl mb-8">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-emerald-400 font-bold text-lg">{{ forloop.counter }}</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-xl font-semibold text-white mb-6 leading-relaxed">
+                                            {{ question_data.question.question_text }}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Answer Options -->
+                            <div class="glass-card p-8 rounded-2xl backdrop-blur-2xl border border-white/20 shadow-xl">
+                                <div class="space-y-4">
+                                    {% if question_data.question.question_type == 'true_false' %}
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <button type="button" class="answer-btn" data-question="{{ question_data.question.id }}" data-answer="0">
+                                                <div class="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <span class="text-green-400 font-bold text-lg">V</span>
+                                                </div>
+                                                <span class="text-white text-lg font-medium">Vrai</span>
+                                            </button>
+                                            <button type="button" class="answer-btn" data-question="{{ question_data.question.id }}" data-answer="1">
+                                                <div class="w-12 h-12 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <span class="text-red-400 font-bold text-lg">F</span>
+                                                </div>
+                                                <span class="text-white text-lg font-medium">Faux</span>
+                                            </button>
+                                        </div>
+                                    {% else %}
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {% for choice in question_data.options %}
+                                            <button type="button" class="answer-btn"
+                                                    data-question="{{ question_data.question.id }}"
+                                                    data-answer="{{ forloop.counter0 }}">
+                                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <span class="text-blue-400 font-bold text-lg">{{ forloop.counter|upper }}</span>
+                                                </div>
+                                                <span class="text-white text-base leading-relaxed">{{ choice }}</span>
+                                            </button>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Navigation -->
+                            <div class="flex justify-between items-center mt-8">
+                                <button type="button" class="nav-btn prev-btn {% if forloop.first %}hidden{% endif %}" data-direction="prev">
+                                    <i class="fas fa-arrow-left mr-2"></i>
+                                    Question précédente
+                                </button>
+                                {% if not forloop.last %}
+                                <div class="text-center">
+                                    <p class="text-gray-400 text-sm mb-2">Double-cliquez sur une réponse pour passer à la question suivante</p>
+                                    <button type="button" class="nav-btn next-btn hidden" data-direction="next">
+                                        Question suivante
+                                        <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                                {% else %}
+                                <div></div>
+                                <button type="submit" class="nav-btn submit-btn" id="submit-quiz">
+                                    <i class="fas fa-trophy mr-2"></i>
+                                    Terminer le quiz
+                                </button>
+                                {% endif %}
+                            </div>
+
+                            <!-- Hidden inputs for answers -->
+                            <input type="hidden" name="question_{{ question_data.question.id }}" id="answer_{{ question_data.question.id }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(25px);
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .answer-btn {
+        display: block;
+        width: 100%;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .answer-btn:hover {
+        background: rgba(16, 185, 129, 0.2);
+        border-color: rgba(16, 185, 129, 0.5);
+        transform: translateY(-2px);
+    }
+
+    .answer-btn.selected {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.3));
+        border-color: rgba(16, 185, 129, 0.8);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);
+    }
+
+    .nav-btn {
+        padding: 0.75rem 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        color: #e2e8f0;
+        text-decoration: none;
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .nav-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #10b981;
+        color: #10b981;
+        transform: translateY(-2px);
+    }
+
+    .nav-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .question-slide {
+        transition: all 0.5s ease-in-out;
+    }
+
+    .question-slide.hidden {
+        opacity: 0;
+        transform: translateX(100%);
+        pointer-events: none;
+    }
+
+    .question-slide.active {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .particle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: linear-gradient(45deg, #10b981, #059669);
+        border-radius: 50%;
+        opacity: 0.6;
+    }
+
+    .particle:nth-child(1) { left: 10%; top: 0; }
+    .particle:nth-child(2) { left: 25%; top: 0; }
+    .particle:nth-child(3) { left: 45%; top: 0; }
+    .particle:nth-child(4) { left: 65%; top: 0; }
+    .particle:nth-child(5) { left: 85%; top: 0; }
+
+    .hidden {
+        display: none !important;
+    }
+
+    @media (max-width: 768px) {
+        .glass-card { padding: 1.5rem; }
+        .grid { grid-template-columns: 1fr; }
+        .answer-btn { padding: 1rem; }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentQuestion = 0;
+    let totalQuestions = {{ questions_data|length }};
+    let selectedAnswers = {};
+
+    const questionSlides = document.querySelectorAll('.question-slide');
+    const answerButtons = document.querySelectorAll('.answer-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const prevBtn = document.querySelector('.prev-btn');
+    const submitBtn = document.querySelector('#submit-quiz');
+    const questionCounter = document.querySelector('#question-counter');
+    const scoreCounter = document.querySelector('#score-counter');
+
+    // Gestionnaire de clic pour les boutons de réponse
+    answerButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const questionId = this.dataset.question;
+            const answerValue = this.dataset.answer;
+
+            // Déselectionner les autres boutons de la même question
+            document.querySelectorAll(`[data-question="${questionId}"]`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Sélectionner le bouton actuel
+            this.classList.add('selected');
+
+            // Enregistrer la réponse
+            selectedAnswers[questionId] = answerValue;
+
+            // Activer le bouton suivant si ce n'est pas la dernière question
+            if (currentQuestion < totalQuestions - 1 && nextBtn) {
+                nextBtn.disabled = false;
+            }
+        });
+
+        // Gestionnaire de double-clic pour passer à la question suivante
+        button.addEventListener('dblclick', function() {
+            const questionId = this.dataset.question;
+            const answerValue = this.dataset.answer;
+
+            // Déselectionner les autres boutons de la même question
+            document.querySelectorAll(`[data-question="${questionId}"]`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Sélectionner le bouton actuel
+            this.classList.add('selected');
+
+            // Enregistrer la réponse
+            selectedAnswers[questionId] = answerValue;
+
+            // Passer automatiquement à la question suivante
+            if (currentQuestion < totalQuestions - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                // Si c'est la dernière question, soumettre le quiz
+                if (submitBtn) {
+                    submitBtn.click();
+                }
+            }
+        });
+    });
+
+    // Navigation entre les questions
+    function showQuestion(index) {
+        console.log(`DEBUG: Showing question ${index + 1} of ${totalQuestions}`);
+        
+        // Masquer toutes les questions
+        questionSlides.forEach(slide => {
+            slide.classList.add('hidden');
+            slide.classList.remove('active');
+        });
+        
+        // Afficher la question actuelle
+        if (questionSlides[index]) {
+            questionSlides[index].classList.remove('hidden');
+            questionSlides[index].classList.add('active');
+        }
+
+        // Mettre à jour le compteur
+        if (questionCounter) {
+            questionCounter.textContent = index + 1;
+        }
+
+        // Mettre à jour l'état des boutons de navigation
+        if (prevBtn) {
+            prevBtn.classList.toggle('hidden', index === 0);
+        }
+        
+        // Gérer le bouton suivant et soumission
+        const allNextBtns = document.querySelectorAll('.next-btn');
+        const allSubmitBtns = document.querySelectorAll('.submit-btn');
+        
+        if (index === totalQuestions - 1) {
+            // Dernière question - masquer tous les boutons suivant
+            allNextBtns.forEach(btn => btn.classList.add('hidden'));
+            allSubmitBtns.forEach(btn => btn.classList.remove('hidden'));
+        } else {
+            // Pas la dernière question - afficher les boutons suivant
+            allNextBtns.forEach(btn => btn.classList.remove('hidden'));
+            allSubmitBtns.forEach(btn => btn.classList.add('hidden'));
+        }
+        
+        console.log(`DEBUG: Question ${index + 1} displayed successfully`);
+    }
+
+    // Bouton suivant
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            if (currentQuestion < totalQuestions - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            }
+        });
+    }
+
+    // Bouton précédent
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+    }
+
+    // Soumission du quiz
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Vérifier que toutes les questions ont une réponse
+            if (Object.keys(selectedAnswers).length < totalQuestions) {
+                alert('Veuillez répondre à toutes les questions avant de soumettre.');
+                return;
+            }
+
+            // Remplir les inputs cachés avec les réponses
+            Object.keys(selectedAnswers).forEach(questionId => {
+                const hiddenInput = document.getElementById(`answer_${questionId}`);
+                if (hiddenInput) {
+                    hiddenInput.value = selectedAnswers[questionId];
+                }
+            });
+
+            // Soumettre le formulaire
+            document.getElementById('quiz-form').submit();
+        });
+    }
+
+    // Initialiser
+    showQuestion(0);
+    if (nextBtn) {
+        nextBtn.disabled = true;
+    }
+});
+</script>
+{% endblock %}

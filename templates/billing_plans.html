@@ -1,0 +1,122 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Abonnements - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-extrabold text-white mb-2">Choisissez votre abonnement</h1>
+      <p class="text-gray-300">Débloquez l'IA et toutes les fonctionnalités premium</p>
+    </div>
+
+    {% if error %}
+      <div class="max-w-xl mx-auto mb-6 bg-red-500/20 border border-red-400/40 text-red-100 px-4 py-3 rounded-lg">{{ error }}</div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {% for plan in plans %}
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 text-white shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">{{ plan.name }}</h2>
+          <div class="text-right">
+            <div class="text-3xl font-extrabold">{{ plan.price }} {{ plan.currency }}</div>
+            <div class="text-gray-300 text-sm">
+              par {% if plan.interval == 'month' %}mois{% elif plan.interval == 'year' %}année{% else %}mois{% endif %}
+            </div>
+          </div>
+        </div>
+        <ul class="space-y-2 text-gray-200 mb-6">
+          <li>• Accès IA (résumés, quiz, chat)</li>
+          <li>• Mises à jour en continu</li>
+          <li>• Support prioritaire</li>
+        </ul>
+
+        <form method="post" action="{% url 'billing_checkout' plan_id=plan.id %}" class="space-y-4">
+          {% csrf_token %}
+          <div>
+            <label class="block text-sm text-blue-200 mb-1">Opérateur Mobile Money</label>
+            <div class="flex items-center gap-3">
+              <select name="operator" id="operatorSelect{{ plan.id }}" class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-blue-400 transition-all duration-300">
+                {% for op in operators %}
+                <option value="{{ op }}" class="text-blue-400 bg-slate-800">{{ op }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm text-blue-200 mb-1">Numéro Mobile Money</label>
+            <input type="text" name="msisdn" id="msisdnInput{{ plan.id }}" placeholder="Ex: 06XXXXXXXX" required
+                   class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-3 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400/50" />
+          </div>
+          <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-semibold py-3 rounded-xl shadow-lg">
+            Continuer avec Mobile Money
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if subscription %}
+    <div class="max-w-3xl mx-auto mt-10 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-sm text-blue-200">Votre abonnement</div>
+          <div class="text-lg font-semibold">{{ subscription.plan.name }} — {{ subscription.status|title }}</div>
+        </div>
+        {% if subscription.current_period_end %}
+        <div class="text-sm text-gray-300">Jusqu'au {{ subscription.current_period_end|date:'d/m/Y H:i' }}</div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Récupérer tous les sélecteurs d'opérateurs et champs téléphone
+    const operatorSelects = document.querySelectorAll('[id^="operatorSelect"]');
+    const msisdnInputs = document.querySelectorAll('[id^="msisdnInput"]');
+
+    operatorSelects.forEach(function(select, index) {
+        const msisdnInput = msisdnInputs[index];
+
+        function adjustSelectWidth() {
+            const selectedValue = select.value;
+
+            if (selectedValue === 'AIRTEL_CONGO') {
+                select.style.width = '200px'; // Élargir pour Airtel Congo
+            } else {
+                select.style.width = '160px'; // Taille normale pour MTN
+            }
+        }
+
+        function updatePlaceholder() {
+            const selectedOperator = select.value;
+
+            if (selectedOperator === 'AIRTEL_CONGO') {
+                msisdnInput.placeholder = 'Ex: 05XXXXXXXX';
+            } else if (selectedOperator === 'MTN') {
+                msisdnInput.placeholder = 'Ex: 06XXXXXXXX';
+            } else {
+                msisdnInput.placeholder = 'Ex: 06XXXXXXXX'; // Défaut MTN
+            }
+        }
+
+        // Ajuster la largeur au chargement de la page
+        adjustSelectWidth();
+        updatePlaceholder();
+
+        // Ajuster la largeur et placeholder quand l'utilisateur change de sélection
+        select.addEventListener('change', function() {
+            adjustSelectWidth();
+            updatePlaceholder();
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

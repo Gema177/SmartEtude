@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-3xl font-bold">Tableau de bord</h1>
+        <div class="text-sm text-gray-600">
+            Bonjour, <span class="font-semibold">{{ user.first_name|default:user.username }}</span>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-blue-50 p-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-blue-100 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Mes cours</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ user_stats.courses_count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-green-50 p-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-green-100 rounded-lg">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Mes quiz</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ user_stats.quizzes_count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-purple-50 p-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-purple-100 rounded-lg">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Tentatives</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ user_stats.attempts_count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-orange-50 p-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-orange-100 rounded-lg">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Score moyen</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ user_stats.avg_score|floatformat:1 }}%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="bg-white p-6 rounded-lg border border-gray-200">
+        <h2 class="text-xl font-semibold mb-4">Actions rapides</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="{% url 'upload' %}" class="bg-blue-600 text-white p-4 rounded-lg text-center hover:bg-blue-700 transition-colors">
+                <div class="text-2xl mb-2">📁</div>
+                <div class="font-semibold">Uploader un cours</div>
+                <div class="text-sm opacity-90">Ajouter un nouveau document</div>
+            </a>
+            <a href="{% url 'upload' %}" class="bg-green-600 text-white p-4 rounded-lg text-center hover:bg-green-700 transition-colors">
+                <div class="text-2xl mb-2">🎯</div>
+                <div class="font-semibold">Créer un quiz</div>
+                <div class="text-sm opacity-90">Générer des questions</div>
+            </a>
+            <a href="{% url 'home' %}" class="bg-purple-600 text-white p-4 rounded-lg text-center hover:bg-purple-700 transition-colors">
+                <div class="text-2xl mb-2">📊</div>
+                <div class="font-semibold">Cours publics</div>
+                <div class="text-sm opacity-90">Explorer les contenus</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Cours récents -->
+    {% if recent_courses %}
+    <div class="bg-white p-6 rounded-lg border border-gray-200">
+        <h2 class="text-xl font-semibold mb-4">Mes cours récents</h2>
+        <div class="space-y-3">
+            {% for course in recent_courses %}
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                    <h3 class="font-medium">{{ course.title }}</h3>
+                    <p class="text-sm text-gray-600">{{ course.created_at|date:"d/m/Y" }} • {{ course.quiz_count }} quiz</p>
+                </div>
+                <a href="{% url 'course_detail' course.id %}" class="text-blue-600 hover:underline">Voir</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Tentatives récentes -->
+    {% if recent_attempts %}
+    <div class="bg-white p-6 rounded-lg border border-gray-200">
+        <h2 class="text-xl font-semibold mb-4">Mes dernières tentatives</h2>
+        <div class="space-y-3">
+            {% for attempt in recent_attempts %}
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                    <h3 class="font-medium">{{ attempt.quiz.title }}</h3>
+                    <p class="text-sm text-gray-600">{{ attempt.completed_at|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div class="text-right">
+                    <div class="font-semibold {% if attempt.percentage >= 70 %}text-green-600{% elif attempt.percentage >= 50 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                        {{ attempt.percentage }}%
+                    </div>
+                    <div class="text-sm text-gray-600">{{ attempt.score }}/{{ attempt.total_questions }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

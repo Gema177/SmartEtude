@@ -1,0 +1,114 @@
+{{ ... }}
+{% extends 'base_tailwind.html' %}
+
+{% block title %}Quiz - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ quiz.title }}</h1>
+            <p class="text-gray-600 mb-8">{{ questions_data|length }} questions • Mode Jeu</p>
+
+            <!-- Debug info -->
+            <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-6">
+                <h3 class="font-semibold text-yellow-800 mb-2">Debug Info:</h3>
+                <p class="text-yellow-700">Questions count: {{ questions_data|length }}</p>
+                {% for q in questions_data %}
+                    <p class="text-yellow-700">Q{{ forloop.counter }}: {{ q.question.question_text|slice:":50" }}... | Type: {{ q.question.question_type }} | Options: {{ q.question.options|length }}</p>
+                {% endfor %}
+            </div>
+
+            <form method="post" id="quiz-form">
+                {% csrf_token %}
+
+                {% for question_data in questions_data %}
+                <div class="mb-8 p-6 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        {{ forloop.counter }}. {{ question_data.question.question_text }}
+                    </h3>
+
+                    {% if question_data.question.question_type == 'true_false' %}
+                        <div class="space-y-3">
+                            <button type="button" class="answer-btn w-full p-4 text-left bg-white border-2 border-gray-300 rounded-lg hover:border-green-500 transition-colors" data-question="{{ question_data.question.id }}" data-answer="0">
+                                Vrai
+                            </button>
+                            <button type="button" class="answer-btn w-full p-4 text-left bg-white border-2 border-gray-300 rounded-lg hover:border-red-500 transition-colors" data-question="{{ question_data.question.id }}" data-answer="1">
+                                Faux
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="space-y-3">
+                            {% for choice in question_data.shuffled_options %}
+                            <button type="button" class="answer-btn w-full p-4 text-left bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 transition-colors"
+                                    data-question="{{ question_data.question.id }}"
+                                    data-answer="{{ forloop.counter0 }}">
+                                {{ choice }}
+                            </button>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <input type="hidden" name="question_{{ question_data.question.id }}" id="answer_{{ question_data.question.id }}">
+                </div>
+                {% endfor %}
+
+                <div class="text-center">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors">
+                        ✅ Terminer le quiz
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .answer-btn.selected {
+        background-color: #10b981 !important;
+        border-color: #10b981 !important;
+        color: white !important;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const answerButtons = document.querySelectorAll('.answer-btn');
+    const selectedAnswers = {};
+
+    answerButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const questionId = this.dataset.question;
+            const answerValue = this.dataset.answer;
+
+            // Déselectionner les autres boutons de la même question
+            document.querySelectorAll(`[data-question="${questionId}"]`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // Sélectionner le bouton actuel
+            this.classList.add('selected');
+
+            // Enregistrer la réponse
+            selectedAnswers[questionId] = answerValue;
+
+            // Remplir l'input caché
+            document.getElementById(`answer_${questionId}`).value = answerValue;
+        });
+    });
+
+    // Soumission du formulaire
+    document.getElementById('quiz-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (Object.keys(selectedAnswers).length < {{ questions_data|length }}) {
+            alert('Veuillez répondre à toutes les questions avant de soumettre.');
+            return;
+        }
+
+        this.submit();
+    });
+});
+</script>
+{% endblock %}
+{{ ... }}

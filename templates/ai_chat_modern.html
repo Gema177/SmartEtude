@@ -1,0 +1,406 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Chat IA - {{ course.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Styles modernes comme ChatGPT */
+.chat-container {
+    height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Animation des messages */
+.message-enter {
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Style des messages */
+.user-message {
+    background: #f3f4f6;
+    border-radius: 18px 18px 4px 18px;
+}
+
+.assistant-message {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px 18px 18px 4px;
+}
+
+/* Input moderne */
+.chat-input {
+    border: 1px solid #d1d5db;
+    border-radius: 24px;
+    transition: all 0.2s ease;
+}
+
+.chat-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Bouton d'envoi */
+.send-button {
+    background: #3b82f6;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.send-button:hover {
+    background: #2563eb;
+    transform: scale(1.05);
+}
+
+.send-button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading animation */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #9ca3af;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Suggestions */
+.suggestion-chip {
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.suggestion-chip:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header moderne -->
+    <div class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-gray-900">Chat IA</h1>
+                        <p class="text-sm text-gray-500">{{ course.title }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span class="text-sm text-gray-500">En ligne</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="max-w-4xl mx-auto bg-white chat-container">
+        <!-- Messages -->
+        <div id="chat-messages" class="chat-messages p-4 space-y-4 break-words whitespace-pre-wrap">
+            <!-- Message de bienvenue -->
+            <div class="flex items-start space-x-3 message-enter">
+                <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <div class="assistant-message p-4 max-w-3xl">
+                    <p class="text-gray-800 break-words whitespace-pre-wrap">Bonjour ! Je suis votre assistant IA pour le cours "{{ course.title }}". Posez-moi vos questions et je vous aiderai à mieux comprendre le contenu.</p>
+                    <p class="text-xs text-gray-500 mt-2">Assistant IA • Maintenant</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suggestions -->
+        <div id="suggestions" class="px-4 pb-2">
+            <div class="flex flex-wrap gap-2">
+                <button class="suggestion-chip px-3 py-2 text-sm text-gray-700" data-suggestion="Explique-moi les concepts clés de ce cours">
+                    Explique-moi les concepts clés
+                </button>
+                <button class="suggestion-chip px-3 py-2 text-sm text-gray-700" data-suggestion="Quels sont les points importants à retenir ?">
+                    Points importants
+                </button>
+                <button class="suggestion-chip px-3 py-2 text-sm text-gray-700" data-suggestion="Peux-tu me donner des exemples pratiques ?">
+                    Exemples pratiques
+                </button>
+                <button class="suggestion-chip px-3 py-2 text-sm text-gray-700" data-suggestion="Comment puis-je appliquer ces connaissances ?">
+                    Application pratique
+                </button>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="border-t border-gray-200 p-4">
+            <form id="chat-form" class="flex items-end space-x-3">
+                {% csrf_token %}
+                <div class="flex-1 relative">
+                    <textarea 
+                        id="question-input" 
+                        name="question" 
+                        rows="1"
+                        class="chat-input w-full px-4 py-3 pr-12 resize-none focus:outline-none"
+                        placeholder="Posez votre question..."
+                        style="min-height: 48px; max-height: 120px;"
+                    ></textarea>
+                    <button 
+                        type="submit" 
+                        id="send-button"
+                        class="send-button absolute right-2 bottom-2 w-8 h-8 flex items-center justify-center text-white"
+                        disabled
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatForm = document.getElementById('chat-form');
+    const chatMessages = document.getElementById('chat-messages');
+    const questionInput = document.getElementById('question-input');
+    const sendButton = document.getElementById('send-button');
+    const suggestions = document.querySelectorAll('.suggestion-chip');
+    
+    // Auto-resize textarea
+    questionInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        
+        // Enable/disable send button
+        sendButton.disabled = this.value.trim() === '';
+    });
+    
+    // Handle suggestions
+    suggestions.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const suggestion = this.dataset.suggestion || this.textContent.trim();
+            if (!suggestion) return;
+            // Ajoute message utilisateur immédiatement
+            addMessage(suggestion, 'user');
+            // Nettoie l'input et désactive le bouton
+            questionInput.value = '';
+            questionInput.style.height = 'auto';
+            sendButton.disabled = true;
+            // Masque les suggestions après le premier envoi
+            const sugg = document.getElementById('suggestions');
+            if (sugg) sugg.style.display = 'none';
+            // Envoie la requête
+            addLoadingMessage();
+            fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: `question=${encodeURIComponent(suggestion)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                removeLoadingMessage();
+                if (data.success) {
+                    addMessage(data.answer, 'assistant');
+                } else {
+                    addMessage('Désolé, une erreur est survenue. Veuillez réessayer.', 'assistant', true);
+                }
+            })
+            .catch(() => {
+                removeLoadingMessage();
+                addMessage('Erreur de connexion. Veuillez réessayer.', 'assistant', true);
+            });
+        });
+    });
+    
+    // Handle form submission
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const question = questionInput.value.trim();
+        if (!question) return;
+        
+        // Add user message
+        addMessage(question, 'user');
+        
+        // Clear input
+        questionInput.value = '';
+        questionInput.style.height = 'auto';
+        sendButton.disabled = true;
+        
+        // Hide suggestions
+        document.getElementById('suggestions').style.display = 'none';
+        
+        // Add loading message
+        addLoadingMessage();
+        
+        // Send request
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: `question=${encodeURIComponent(question)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            removeLoadingMessage();
+            
+            if (data.success) {
+                addMessage(data.answer, 'assistant');
+            } else {
+                addMessage('Désolé, une erreur est survenue. Veuillez réessayer.', 'assistant', true);
+            }
+        })
+        .catch(error => {
+            removeLoadingMessage();
+            addMessage('Erreur de connexion. Veuillez réessayer.', 'assistant', true);
+        });
+    });
+    
+    function addMessage(content, sender, isError = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex items-start space-x-3 message-enter ${sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`;
+        
+        const avatar = sender === 'user' ? 
+            `<div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+            </div>` :
+            `<div class="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+            </div>`;
+        
+        const messageClass = sender === 'user' ? 'user-message' : 'assistant-message';
+        const textColor = isError ? 'text-red-600' : (sender === 'user' ? 'text-gray-800' : 'text-gray-800');
+        
+        messageDiv.innerHTML = `
+            ${avatar}
+            <div class="${messageClass} p-4 max-w-3xl overflow-hidden">
+                <p class="${textColor} break-words whitespace-pre-wrap">${content}</p>
+                <p class="text-xs text-gray-500 mt-2">${sender === 'user' ? 'Vous' : 'Assistant IA'} • Maintenant</p>
+            </div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    function addLoadingMessage() {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loading-message';
+        loadingDiv.className = 'flex items-start space-x-3 message-enter';
+        
+        loadingDiv.innerHTML = `
+            <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+            <div class="assistant-message p-4 max-w-3xl">
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        `;
+        
+        chatMessages.appendChild(loadingDiv);
+        scrollToBottom();
+    }
+    
+    function removeLoadingMessage() {
+        const loadingMessage = document.getElementById('loading-message');
+        if (loadingMessage) {
+            loadingMessage.remove();
+        }
+    }
+    
+    function scrollToBottom() {
+        setTimeout(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 100);
+    }
+    
+    // Initial scroll
+    scrollToBottom();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,216 @@
+{% extends 'base_tailwind.html' %}
+{% load static %}
+
+{% block title %}Générer un Quiz IA - SmartEtude{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <!-- Particules animées -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">
+                <span class="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    🎯 Quiz IA Intelligent
+                </span>
+            </h1>
+            <p class="text-gray-300 text-lg">Générez un quiz personnalisé avec l'intelligence artificielle</p>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
+                <form method="post" action="" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Informations du cours -->
+                    <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+                        <h3 class="text-white font-semibold mb-4 flex items-center">
+                            <i class="fas fa-book mr-2 text-purple-400"></i>
+                            Informations du Cours
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-300 text-sm mb-2">Titre du cours</label>
+                                <div class="text-white font-medium">{{ course.title }}</div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm mb-2">Date de création</label>
+                                <div class="text-white">{{ course.created_at|date:"d/m/Y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Options de quiz -->
+                    <div>
+                        <h3 class="text-white font-semibold mb-4 flex items-center">
+                            <i class="fas fa-cog mr-2 text-blue-400"></i>
+                            Options du Quiz
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Langue -->
+                            <div>
+                                <label class="block text-white font-medium mb-3">Langue du Quiz</label>
+                                <select name="language" class="w-full bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all duration-300">
+                                    <option value="french" {% if selected_language == 'french' %}selected{% endif %}>🇫🇷 Français (Original)</option>
+                                    <option value="english" {% if selected_language == 'english' %}selected{% endif %}>🇺🇸 English (Traduction complète)</option>
+                                    <option value="spanish" {% if selected_language == 'spanish' %}selected{% endif %}>🇪🇸 Español (Traduction partielle)</option>
+                                </select>
+                                <p class="text-gray-400 text-sm mt-2">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Le quiz sera généré dans la langue sélectionnée
+                                </p>
+                            </div>
+
+                            <!-- Niveau -->
+                            <div>
+                                <label class="block text-white font-medium mb-3">Niveau de Difficulté</label>
+                                <select name="level" class="w-full bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all duration-300">
+                                    <option value="beginner" {% if selected_level == 'beginner' %}selected{% endif %}>🌱 Débutant</option>
+                                    <option value="intermediate" {% if selected_level == 'intermediate' %}selected{% endif %}>🎯 Intermédiaire</option>
+                                    <option value="advanced" {% if selected_level == 'advanced' %}selected{% endif %}>🚀 Avancé</option>
+                                </select>
+                            </div>
+
+                            <!-- Nombre de questions -->
+                            <div>
+                                <label class="block text-white font-medium mb-3">Nombre de Questions</label>
+                                <select name="num_questions" class="w-full bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/50 transition-all duration-300">
+                                    <option value="3">3 questions</option>
+                                    <option value="5" selected>5 questions</option>
+                                    <option value="10">10 questions</option>
+                                    <option value="15">15 questions</option>
+                                </select>
+                            </div>
+
+                            <!-- Types de questions -->
+                            <div>
+                                <label class="block text-white font-medium mb-3">Types de Questions</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center text-white">
+                                        <input type="checkbox" name="question_types" value="multiple_choice" checked class="mr-3 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                                        <span>QCM (Choix multiples)</span>
+                                    </label>
+                                    <label class="flex items-center text-white">
+                                        <input type="checkbox" name="question_types" value="true_false" checked class="mr-3 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                                        <span>Vrai/Faux</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Indicateur de chargement -->
+                    <div id="loadingIndicator" class="hidden bg-blue-500/20 border border-blue-400/30 rounded-xl p-6 mb-6">
+                        <div class="flex items-center justify-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mr-4"></div>
+                            <div class="text-blue-300">
+                                <h4 class="font-semibold">Génération du Quiz en cours...</h4>
+                                <p class="text-sm text-blue-400">L'IA analyse le contenu et génère des questions personnalisées</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bouton de génération -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button type="submit" id="generateBtn" class="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-magic mr-2"></i>
+                            <span id="btnText">Générer le Quiz</span>
+                        </button>
+                        <a href="{% url 'course_detail' course_id=course.id %}" class="flex-1 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold py-4 px-6 rounded-xl border border-white/20 transition-all duration-300 text-center">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Retour au Cours
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animation des sélecteurs
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+        select.addEventListener('change', function() {
+            const fieldName = this.name;
+            const fieldNames = {
+                'language': 'Langue',
+                'level': 'Niveau',
+                'num_questions': 'Nombre de questions'
+            };
+            
+            showNotification(`${fieldNames[fieldName]} sélectionné: ${this.options[this.selectedIndex].text}`, 'success');
+        });
+        
+        // Effet de focus
+        select.addEventListener('focus', function() {
+            this.style.borderColor = '#8B5CF6';
+            this.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
+        });
+        
+        select.addEventListener('blur', function() {
+            this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Gestion du formulaire de génération
+    const form = document.querySelector('form');
+    const generateBtn = document.getElementById('generateBtn');
+    const btnText = document.getElementById('btnText');
+    
+    if (form && generateBtn && btnText) {
+        form.addEventListener('submit', function(e) {
+            // Afficher l'état de chargement
+            generateBtn.disabled = true;
+            generateBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Génération en cours...';
+            
+            // Afficher l'indicateur de chargement
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) {
+                loadingIndicator.classList.remove('hidden');
+            }
+            
+            // Afficher une notification
+            showNotification('Génération du quiz en cours...', 'info');
+            
+            // Laisser le formulaire se soumettre normalement
+        });
+    }
+    
+    // Fonction de notification
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transform translate-x-full transition-transform duration-300 ${
+            type === 'success' ? 'bg-green-500' : 
+            type === 'error' ? 'bg-red-500' : 
+            'bg-blue-500'
+        }`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(full)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+});
+</script>
+{% endblock %}
