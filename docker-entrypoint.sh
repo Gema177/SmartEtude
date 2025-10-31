@@ -23,15 +23,26 @@ wait_for_db() {
     fi
 }
 
-# Fonction pour attendre que Redis soit prêt
+# Fonction pour attendre que Redis soit prêt (CORRIGÉE)
 wait_for_redis() {
     log "Attente de Redis..."
     
-    until python -c "import redis; redis.Redis.from_url('$REDIS_URL').ping()" 2>/dev/null; do
-        log "Redis non disponible, attente..."
+    # Timeout de 30 secondes maximum
+    local timeout=30
+    local counter=0
+    
+    while [ $counter -lt $timeout ]; do
+        if python -c "import redis; redis.Redis.from_url('$REDIS_URL').ping()" 2>/dev/null; then
+            log "Redis prêt !"
+            return 0
+        fi
+        log "Redis non disponible, attente... ($((timeout - counter)) secondes restantes)"
         sleep 2
+        counter=$((counter + 2))
     done
-    log "Redis prêt !"
+    
+    log "ATTENTION: Redis non disponible après $timeout secondes, continuation sans Redis"
+    return 1
 }
 
 # Fonction pour exécuter les migrations
@@ -83,27 +94,7 @@ main() {
     
     # Attendre les services
     wait_for_db
-    # Fonction pour attendre que Redis soit prêt
-wait_for_redis() {
-    log "Attente de Redis..."
-    
-    # Timeout de 30 secondes maximum
-    local timeout=30
-    local counter=0
-    
-    while [ $counter -lt $timeout ]; do
-        if python -c "import redis; redis.Redis.from_url('$REDIS_URL').ping()" 2>/dev/null; then
-            log "Redis prêt !"
-            return 0
-        fi
-        log "Redis non disponible, attente... ($((timeout - counter)) secondes restantes)"
-        sleep 2
-        counter=$((counter + 2))
-    done
-    
-    log "ATTENTION: Redis non disponible après $timeout secondes, continuation sans Redis"
-    return 1
-}
+    wait_for_redis
     
     # Initialisation
     run_migrations
@@ -115,8 +106,9 @@ wait_for_redis() {
     
     log "Initialisation terminée !"
     
-    # Exécuter la commande passée
-    exec "$@"
+    # DÉMARRER GUNICORN (AJOUTEZ CETTE LIGNE)
+    log "Démarrage de Gunicorn..."
+    exec gunicorn smartetude.wsgi:application --bind 0.0.0.0:10000
 }
 
 # Gestion des signaux
