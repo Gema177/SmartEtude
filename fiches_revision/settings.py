@@ -317,10 +317,13 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # Renforcer la gestion de session
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-# Durée de vie des cookies de session (1 heure)
-SESSION_COOKIE_AGE = 60 * 60
+# Durée de vie des cookies de session (5heure)
+SESSION_COOKIE_AGE = 5*60 * 60
 # Renouvelle l'expiration à chaque requête utilisateur
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_SECURE = not DEBUG  # True en production
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = not DEBUG  # True en production
 
 # =============================================================================
 # CONFIGURATION DE SÉCURITÉ
