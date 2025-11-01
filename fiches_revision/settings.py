@@ -315,15 +315,16 @@ LOGIN_REDIRECT_URL = 'dashboard'
 # Rediriger vers la page demandée après connexion si 'next' est dans l'URL
 LOGOUT_REDIRECT_URL = 'home'
 
-# Renforcer la gestion de session
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-# Durée de vie des cookies de session (5heure)
-SESSION_COOKIE_AGE = 5*60 * 60
-# Renouvelle l'expiration à chaque requête utilisateur
+# Paramètres de session
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Utiliser la base de données pour les sessions
+SESSION_COOKIE_AGE = 5 * 60 * 60  # 5 heures
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
-SESSION_COOKIE_SECURE = not DEBUG  # True en production
 SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SECURE = not DEBUG  # True en production
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+# Utiliser un sérialiseur JSON plus sécurisé
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # =============================================================================
 # CONFIGURATION DE SÉCURITÉ
