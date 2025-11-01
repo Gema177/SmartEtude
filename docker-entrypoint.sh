@@ -89,12 +89,13 @@ health_check() {
 }
 
 # Fonction principale
+# Fonction principale
 main() {
     log "Démarrage de la Plateforme de Révision Intelligente..."
     
     # Attendre les services
     wait_for_db
-    wait_for_redis
+    # wait_for_redis  # <-- COMMENTEZ CETTE LIGNE (déjà appelé avant)
     
     # Initialisation
     run_migrations
@@ -106,13 +107,11 @@ main() {
     
     log "Initialisation terminée !"
     
-    # DÉMARRER GUNICORN (AJOUTEZ CETTE LIGNE)
+    # DÉMARRER GUNICORN
     log "Démarrage de Gunicorn..."
     exec gunicorn smartetude.wsgi:application --bind 0.0.0.0:10000
 }
 
-# Gestion des signaux
-trap 'log "Arrêt de l'\''application..."; exit 0' SIGTERM SIGINT
 
 # Lancer la fonction principale
 main "$@"
