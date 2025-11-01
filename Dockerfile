@@ -126,4 +126,4 @@ ENTRYPOINT ["/app/docker-entrypoint.sh"]
 # =============================================================================
 # COMMANDE PAR DÉFAUT
 # =============================================================================
-CMD ["gunicorn", "smartetude.wsgi:application", "--bind", "0.0.0.0:10000", "--workers", "3"]
+CMD ["gunicorn", "fiches_revision.wsgi:application", "--bind", "0.0.0.0:10000", "--workers", "2", "--timeout", "120"]

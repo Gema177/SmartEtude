@@ -53,7 +53,15 @@ main() {
     health_check
     log "Initialisation terminée !"
     log "Démarrage de Gunicorn..."
-    exec gunicorn smartetude.wsgi:application --bind 0.0.0.0:10000 --workers 3
+    PORT=${PORT:-10000}
+    log "Démarrage de Gunicorn sur le port $PORT..."
+    exec gunicorn fiches_revision.wsgi:application \
+        --bind 0.0.0.0:$PORT \
+        --workers 2 \
+        --timeout 120 \
+        --access-logfile - \
+        --error-logfile - \
+        --log-level info
 }
 
 main "$@"
