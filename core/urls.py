@@ -6,7 +6,10 @@ urlpatterns = [
     # Pages principales
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='login_professional.html'), name='login'),
+    path('login/', auth_views.LoginView.as_view(
+        template_name='login_professional.html',
+        redirect_authenticated_user=True
+    ), name='login'),
     path('logout/', views.custom_logout, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('upload/', views.upload_course, name='upload'),

@@ -78,7 +78,10 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     
     # Fichiers statiques (CSS, JS, images)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # En développement, servir depuis STATICFILES_DIRS (static/) 
+    # Django's runserver le fait automatiquement, mais on le fait explicitement ici aussi
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    urlpatterns += staticfiles_urlpatterns()
     
     # Debug toolbar (chargée uniquement en DEV)
     import debug_toolbar

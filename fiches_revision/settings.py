@@ -208,7 +208,13 @@ STATICFILES_DIRS = [
 ]
 
 # Configuration WhiteNoise pour servir les fichiers statiques en production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Utiliser CompressedStaticFilesStorage au lieu de Manifest pour éviter les problèmes de manifest
+# En développement, utiliser un storage simple sans compression
+if DEBUG:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    # Utiliser CompressedStaticFilesStorage sans manifest pour éviter les erreurs
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Configuration WhiteNoise
 WHITENOISE_USE_FINDERS = True
@@ -304,8 +310,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 # =============================================================================
 
 # URL de connexion/déconnexion
-LOGIN_URL = 'login'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = 'dashboard'
+# Rediriger vers la page demandée après connexion si 'next' est dans l'URL
 LOGOUT_REDIRECT_URL = 'home'
 
 # Renforcer la gestion de session
