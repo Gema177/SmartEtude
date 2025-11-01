@@ -28,11 +28,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-xxl-project-2024')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+# Configuration ALLOWED_HOSTS
+allowed_hosts_default = '127.0.0.1,localhost,0.0.0.0'
+# Sur Render, ajouter automatiquement le domaine
+render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_hostname:
+    allowed_hosts_default += f',{render_hostname}'
 
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS', 
-    default='127.0.0.1,localhost,0.0.0.0', 
+    default=allowed_hosts_default, 
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 
@@ -290,6 +297,19 @@ X_FRAME_OPTIONS = 'DENY'
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+
+# Sécurité HTTPS (production)
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+
+# Détection automatique de l'environnement de production
+if os.environ.get('RENDER'):
+    # Sur Render, activer la sécurité HTTPS
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    DEBUG = False
 
 # =============================================================================
 # PAIEMENTS LYGOS (Mobile Money)

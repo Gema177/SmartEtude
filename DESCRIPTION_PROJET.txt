@@ -1,0 +1,12 @@
+SmartEtude est une plateforme de révision intelligente qui transforme 
+vos documents de cours en expériences d'apprentissage interactives. 
+Après avoir uploadé vos fichiers PDF, DOCX ou TXT, l'intelligence 
+artificielle extrait automatiquement le contenu et génère des résumés 
+intelligents ainsi que des quiz personnalisés avec des questions à 
+choix multiples et vrai/faux. Vous pouvez ensuite passer les quiz en mode 
+jeu interactif, suivre vos performances grâce à un tableau de bord analytique 
+détaillé,
+ et consulter les corrections détaillées pour améliorer votre compréhension.
+  La plateforme combine gamification, analytics en temps réel et recommandations personnalisées pour créer une méthode de révision efficace
+   et adaptée à votre niveau.
+
