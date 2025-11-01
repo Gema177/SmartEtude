@@ -207,7 +207,6 @@ def ai_settings(request):
 
 
 @login_required
-@subscription_required
 def phi3_summary_view(request, course_id):
     """Vue pour générer un résumé avec Phi-3"""
     course = get_object_or_404(Course, id=course_id)
