@@ -131,10 +131,10 @@ class QuizListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
         fields = [
-            'id', 'title', 'description', 'course', 'difficulty',
-            'time_limit', 'passing_score', 'max_attempts',
-            'total_attempts', 'average_score', 'success_rate',
-            'is_active', 'created_at'
+                'id', 'title', 'description', 'course', 'difficulty',
+                'time_limit', 'passing_score', 'max_attempts',
+                'total_attempts', 'average_score', 'success_rate',
+                'is_active', 'created_at', 'question_count'
         ]
     
     def get_question_count(self, obj):
