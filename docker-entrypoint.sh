@@ -17,6 +17,21 @@ run_migrations() {
     log "Migrations terminées !"
 }
 
+build_assets() {
+    log "Build des assets CSS..."
+    if [ -f package.json ]; then
+        if [ ! -d "node_modules" ]; then
+            log "Installation des dépendances Node.js..."
+            npm install
+        fi
+        log "Compilation du CSS..."
+        npm run build:css || {
+            log "WARNING: Le build CSS a échoué, mais on continue..."
+        }
+    fi
+    log "Assets buildés !"
+}
+
 collect_static() {
     log "Collecte des fichiers statiques..."
     python manage.py collectstatic --noinput
@@ -47,6 +62,7 @@ health_check() {
 main() {
     log "Démarrage de la Plateforme de Révision Intelligente..."
     wait_for_db
+    build_assets
     run_migrations
     collect_static
     create_superuser

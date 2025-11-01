@@ -21,6 +21,19 @@ python manage.py migrate --noinput || {
     exit 1
 }
 
+# Build des assets CSS avant collectstatic
+echo "Build des assets CSS..."
+if [ -f package.json ]; then
+    if [ ! -d "node_modules" ]; then
+        echo "Installation des dépendances Node.js..."
+        npm install
+    fi
+    echo "Compilation du CSS..."
+    npm run build:css || {
+        echo "WARNING: Le build CSS a échoué, mais on continue..."
+    }
+fi
+
 # Collecter les fichiers statiques
 echo "Collecte des fichiers statiques..."
 python manage.py collectstatic --noinput || {
