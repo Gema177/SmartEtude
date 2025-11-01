@@ -289,6 +289,9 @@
                             </button>
                         </form>
                     {% else %}
+                        <a href="https://duvetgema.netlify.app" target="_blank" class="nav-link-modern">
+                            <i class="fas fa-user-tie mr-2"></i>DuvetGema
+                        </a>
                         <a href="{% url 'login' %}" class="nav-link-modern">
                             <i class="fas fa-sign-in-alt mr-2"></i>Connexion
                         </a>
@@ -401,10 +404,15 @@
             </div>
             
             <div class="border-t border-gray-600 mt-8 pt-8 text-center">
-                <p class="text-gray-400">
+                <p class="text-gray-400 mb-4">
                     &copy; 2025 SmartEtude - Tous droits réservés | 
-                                            <span class="gradient-text font-semibold">Solution Professionnelle</span>
+                    <span class="gradient-text font-semibold">Solution Professionnelle</span>
                 </p>
+                <a href="https://duvetgema.netlify.app" target="_blank" 
+                   class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity">
+                    <i class="fas fa-external-link-alt mr-2"></i>
+                    Visiter le portfolio du développeur
+                </a>
             </div>
         </div>
     </footer>

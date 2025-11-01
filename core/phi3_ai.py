@@ -41,7 +41,7 @@ class Phi3AI:
             system_prompt = self._get_system_prompt("summary", level, language)
             messages = [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Résume ce texte de manière {level} en {language}:\n\n{text[:8000]}"},
+                {"role": "user", "content": f"Résume ce texte de manière {level} en {language}:\n\n{text[:16000]}"},
             ]
             result = self._chat_completion(messages)
             return {

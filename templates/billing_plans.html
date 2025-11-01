@@ -1,21 +1,25 @@
-{% extends 'base_tailwind.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Abonnements - SmartEtude{% endblock %}
+{% block title %}Version d'essai - SmartEtude{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12">
-  <div class="max-w-5xl mx-auto px-4">
-    <div class="text-center mb-10">
-      <h1 class="text-4xl font-extrabold text-white mb-2">Choisissez votre abonnement</h1>
-      <p class="text-gray-300">Débloquez l'IA et toutes les fonctionnalités premium</p>
-    </div>
-
-    {% if error %}
-      <div class="max-w-xl mx-auto mb-6 bg-red-500/20 border border-red-400/40 text-red-100 px-4 py-3 rounded-lg">{{ error }}</div>
-    {% endif %}
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold text-white sm:text-5xl md:text-6xl">
+                <span class="block">Version d'essai</span>
+                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Toutes les fonctionnalités sont activées</span>
+            </h1>
+            <div class="mt-6 p-4 bg-blue-900/30 rounded-lg border border-blue-500 max-w-3xl mx-auto">
+                <p class="text-lg text-blue-100">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Profitez de toutes les fonctionnalités en version d'essai pour une durée limitée.
+                    Le système d'abonnement est temporairement désactivé.
+                </p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       {% for plan in plans %}
       <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 text-white shadow-xl">
         <div class="flex items-center justify-between mb-4">

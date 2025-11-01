@@ -14,25 +14,22 @@ from .models import Subscription
 
 
 def subscription_required(view_func: Callable) -> Callable:
-    """Vérifie qu'un utilisateur possède un abonnement actif.
-
-    Redirige vers la page des plans avec un message sinon.
+    """Décorateur temporairement désactivé pour permettre l'accès sans abonnement.
+    
+    Toutes les fonctionnalités sont disponibles en version d'essai.
     """
 
     @wraps(view_func)
-    def _wrapped(request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def _wrapped_view(request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not request.user.is_authenticated:
-            # Laisser @login_required gérer la redirection
-            return view_func(request, *args, **kwargs)
-        now = timezone.now()
-        has_active = (
-            Subscription.objects.filter(user=request.user, status="active")
-            .filter(models.Q(current_period_end__isnull=True) | models.Q(current_period_end__gt=now))
-            .exists()
+            return redirect(f"{reverse('login')}?next={request.path}")
+            
+        # Afficher un message indiquant que c'est une version d'essai
+        messages.info(
+            request,
+            "Version d'essai - Toutes les fonctionnalités sont actuellement disponibles.",
         )
-        if not has_active:
-            messages.warning(request, "Vous devez avoir un abonnement actif pour accéder à cette fonctionnalité.")
-            return redirect(reverse("billing_plans"))
+        
         return view_func(request, *args, **kwargs)
 
-    return _wrapped
+    return _wrapped_view
