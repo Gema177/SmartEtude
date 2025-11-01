@@ -112,12 +112,16 @@ MIDDLEWARE = [
 
 # Activer la debug toolbar uniquement en développement
 if DEBUG:
-    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+    # Add debug toolbar at the beginning of the middleware list
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+    
     # IPs internes autorisées pour la toolbar
+    import socket
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [
         '127.0.0.1',
         'localhost',
-    ]
+    ] + [ip[:-1] + '1' for ip in ips]  # Add all possible internal IPs
 
 # =============================================================================
 # CONFIGURATION DES TEMPLATES ET URLS
@@ -322,9 +326,23 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
-# Utiliser un sérialiseur JSON plus sécurisé
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+SESSION_COOKIE_SAMESITE = 'Lax'  # Important pour la sécurité CSRF
+SESSION_COOKIE_PATH = '/'
+
+# Utiliser PickleSerializer pour une meilleure compatibilité
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+# Configurer le cache pour les sessions (optionnel mais recommandé pour les performances)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+# Utiliser le cache pour les sessions (optionnel)
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# SESSION_CACHE_ALIAS = 'default'
 
 # =============================================================================
 # CONFIGURATION DE SÉCURITÉ
@@ -338,9 +356,11 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
 # Sécurité HTTPS (production)
-SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
-SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
-CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=not DEBUG, cast=bool)
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=not DEBUG, cast=bool)
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=not DEBUG, cast=bool)
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'  # Important pour la sécurité CSRF
 
 # Détection automatique de l'environnement de production
 if os.environ.get('RENDER'):
