@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+from drf_spectacular.types import OpenApiTypes
 
 from .serializers import *
 from core.models import *
@@ -203,6 +205,9 @@ class SearchViewSet(viewsets.ViewSet):
     """API de recherche globale"""
     permission_classes = [IsAuthenticatedOrReadOnly]
     
+    @extend_schema(
+        responses={200: SearchResultSerializer}
+    )
     @action(detail=False, methods=['get'])
     def global_search(self, request):
         """Recherche globale dans les cours et quizzes"""
@@ -268,6 +273,9 @@ class UserProfileView(APIView):
     """Vue pour le profil utilisateur connecté"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        responses={200: UserProfileSerializer}
+    )
     def get(self, request):
         """Récupère le profil de l'utilisateur connecté"""
         profile = getattr(request.user, 'profile', None)
@@ -277,6 +285,10 @@ class UserProfileView(APIView):
         serializer = UserProfileSerializer(profile)
         return Response(serializer.data)
     
+    @extend_schema(
+        request=UserProfileUpdateSerializer,
+        responses={200: UserProfileSerializer}
+    )
     def put(self, request):
         """Met à jour le profil de l'utilisateur connecté"""
         profile = getattr(request.user, 'profile', None)
@@ -295,6 +307,9 @@ class DashboardAnalyticsView(APIView):
     """Vue pour les analytics du tableau de bord"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request):
         """Récupère les analytics du tableau de bord"""
         user = request.user
@@ -317,6 +332,9 @@ class CourseAnalyticsView(APIView):
     """Vue pour les analytics d'un cours spécifique"""
     permission_classes = [IsAuthenticated, IsCourseOwnerOrReadOnly]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request, course_id):
         """Récupère les analytics d'un cours"""
         course = get_object_or_404(Course, id=course_id)
@@ -339,6 +357,9 @@ class UserAnalyticsView(APIView):
     """Vue pour les analytics d'un utilisateur"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request, user_id):
         """Récupère les analytics d'un utilisateur"""
         # Les utilisateurs ne peuvent voir que leurs propres analytics
@@ -370,6 +391,9 @@ class CourseRecommendationsView(APIView):
     """Vue pour les recommandations de cours"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request):
         """Récupère les recommandations de cours personnalisées"""
         user = request.user
@@ -399,6 +423,9 @@ class QuizRecommendationsView(APIView):
     """Vue pour les recommandations de quiz"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request):
         """Récupère les recommandations de quiz personnalisées"""
         user = request.user
@@ -431,6 +458,9 @@ class LeaderboardView(APIView):
     """Vue pour le classement des utilisateurs"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request):
         """Récupère le classement des utilisateurs"""
         # Classement par points d'expérience
@@ -456,6 +486,9 @@ class AchievementsView(APIView):
     """Vue pour les réalisations"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request):
         """Récupère les réalisations de l'utilisateur"""
         profile = getattr(request.user, 'profile', None)
@@ -469,6 +502,9 @@ class BadgesView(APIView):
     """Vue pour les badges"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request):
         """Récupère les badges de l'utilisateur"""
         profile = getattr(request.user, 'profile', None)
@@ -483,6 +519,9 @@ class ExportCoursePDFView(APIView):
     """Vue pour l'export PDF d'un cours"""
     permission_classes = [IsAuthenticated, IsCourseOwnerOrReadOnly]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request, course_id):
         """Exporte un cours en PDF"""
         course = get_object_or_404(Course, id=course_id)
@@ -499,6 +538,9 @@ class ExportQuizResultsPDFView(APIView):
     """Vue pour l'export PDF des résultats de quiz"""
     permission_classes = [IsAuthenticated]
     
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request, attempt_id):
         """Exporte les résultats d'un quiz en PDF"""
         attempt = get_object_or_404(QuizAttempt, id=attempt_id)
@@ -518,6 +560,10 @@ class AIProcessingWebhookView(APIView):
     """Webhook pour le traitement IA"""
     permission_classes = []  # Pas d'authentification pour les webhooks
     
+    @extend_schema(
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def post(self, request):
         """Reçoit les résultats du traitement IA"""
         # TODO: Implémenter le traitement des webhooks IA
@@ -528,6 +574,10 @@ class AnalyticsWebhookView(APIView):
     """Webhook pour les analytics"""
     permission_classes = []  # Pas d'authentification pour les webhooks
     
+    @extend_schema(
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def post(self, request):
         """Reçoit les données d'analytics"""
         # TODO: Implémenter le traitement des webhooks analytics

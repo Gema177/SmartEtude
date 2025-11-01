@@ -24,11 +24,25 @@ from sentry_sdk.integrations.django import DjangoIntegration
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-xxl-project-2024')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# En production, SECRET_KEY doit être défini via variable d'environnement
+secret_key_default = config('SECRET_KEY', default=None)
+if secret_key_default is None or (isinstance(secret_key_default, str) and secret_key_default.startswith('django-insecure-')):
+    # Générer un secret key aléatoire si aucun n'est fourni
+    from django.core.management.utils import get_random_secret_key
+    SECRET_KEY = get_random_secret_key()
+    # Avertir si en production
+    if os.environ.get('RENDER') or not DEBUG:
+        import warnings
+        warnings.warn(
+            "SECRET_KEY généré automatiquement. Définissez SECRET_KEY dans les variables d'environnement pour la production!",
+            UserWarning
+        )
+else:
+    SECRET_KEY = secret_key_default
 
 # Configuration ALLOWED_HOSTS
 allowed_hosts_default = '127.0.0.1,localhost,0.0.0.0'
