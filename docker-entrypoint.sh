@@ -94,7 +94,11 @@ main() {
     log "Démarrage de la Plateforme de Révision Intelligente..."
     
     # Attendre les services
-    wait_for_db
+    wwait_for_db() {
+    log "Attente de la base de données..."
+    sleep 10  # Attendre 10 secondes pour laisser la DB démarrer
+    log "Continuation avec la base de données..."
+}
     # wait_for_redis  # <-- COMMENTEZ CETTE LIGNE (déjà appelé avant)
     
     # Initialisation
