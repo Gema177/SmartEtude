@@ -29,11 +29,18 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # En production, SECRET_KEY doit être défini via variable d'environnement
+import secrets
+import string
+
+def generate_secret_key():
+    """Génère une clé secrète aléatoire compatible Django"""
+    chars = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(secrets.choice(chars) for _ in range(50))
+
 secret_key_default = config('SECRET_KEY', default=None)
 if secret_key_default is None or (isinstance(secret_key_default, str) and secret_key_default.startswith('django-insecure-')):
     # Générer un secret key aléatoire si aucun n'est fourni
-    from django.core.management.utils import get_random_secret_key
-    SECRET_KEY = get_random_secret_key()
+    SECRET_KEY = generate_secret_key()
     # Avertir si en production
     if os.environ.get('RENDER') or not DEBUG:
         import warnings
