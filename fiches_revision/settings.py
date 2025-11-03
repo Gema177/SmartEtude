@@ -88,7 +88,6 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'drf_spectacular',
     'debug_toolbar',
-    'sslserver',
     
     # Applications locales
     'core',
@@ -126,6 +125,8 @@ if DEBUG:
     
     # Ajouter le middleware de la debug toolbar
     MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+    # Activer le serveur SSL de développement uniquement en DEBUG
+    INSTALLED_APPS.append('sslserver')
     
     # Configuration supplémentaire pour la debug toolbar
     DEBUG_TOOLBAR_CONFIG = {
