@@ -22,7 +22,7 @@ COPY . /app/
 EXPOSE 8000
 
 # Default CMD: apply migrations, collect static, then start gunicorn
-CMD ["/bin/sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn fiches_revision.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
+CMD ["/bin/sh", "-c", "python manage.py makemigrations core ai_engine analytics api gamification --noinput || true && python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn fiches_revision.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
 # =============================================================================
 # DOCKERFILE - SMARTETUDE
 # =============================================================================
