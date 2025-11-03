@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'drf_spectacular',
     'debug_toolbar',
+    'sslserver',
     
     # Applications locales
     'core',
@@ -110,18 +111,26 @@ MIDDLEWARE = [
     # 'ratelimit.middleware.RatelimitMiddleware',  # Temporairement désactivé
 ]
 
-# Activer la debug toolbar uniquement en développement
+# Configuration pour la debug toolbar
 if DEBUG:
-    # Add debug toolbar at the beginning of the middleware list
+    # IPs internes autorisées pour la toolbar
+    INTERNAL_IPS = ['127.0.0.1', 'localhost']
+    
+    # Ajouter les IPs de conteneurs Docker si nécessaire
+    try:
+        import socket
+        hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+        INTERNAL_IPS.extend(ip for ip in ips if not ip.startswith('172.'))
+    except:
+        pass
+    
+    # Ajouter le middleware de la debug toolbar
     MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
     
-    # IPs internes autorisées pour la toolbar
-    import socket
-    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [
-        '127.0.0.1',
-        'localhost',
-    ] + [ip[:-1] + '1' for ip in ips]  # Add all possible internal IPs
+    # Configuration supplémentaire pour la debug toolbar
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+    }
 
 # =============================================================================
 # CONFIGURATION DES TEMPLATES ET URLS
@@ -282,6 +291,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
 ]
 
+# Ajouter automatiquement le domaine Render aux origines CORS si disponible
+if render_hostname:
+    try:
+        CORS_ALLOWED_ORIGINS.append(f"https://{render_hostname}")
+    except Exception:
+        pass
+
 # =============================================================================
 # CONFIGURATION CELERY
 # =============================================================================
@@ -330,7 +346,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'  # Important pour la sécurité CSRF
 SESSION_COOKIE_PATH = '/'
 
 # Utiliser PickleSerializer pour une meilleure compatibilité
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # Configurer le cache pour les sessions (optionnel mais recommandé pour les performances)
 CACHES = {
@@ -361,6 +377,10 @@ SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=not DEBUG, cast=
 CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=not DEBUG, cast=bool)
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Lax'  # Important pour la sécurité CSRF
+
+# Support du reverse proxy TLS (Render, Nginx, etc.)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 # Détection automatique de l'environnement de production
 if os.environ.get('RENDER'):
