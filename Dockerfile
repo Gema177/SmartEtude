@@ -21,8 +21,8 @@ COPY . /app/
 
 EXPOSE 8000
 
-# Default CMD (Render dashboard may override)
-CMD ["gunicorn", "fiches_revision.wsgi:application", "--bind", "0.0.0.0:8000"]
+# Default CMD (Render sets PORT; fall back to 8000 locally)
+CMD ["/bin/sh", "-c", "gunicorn fiches_revision.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
 # =============================================================================
 # DOCKERFILE - SMARTETUDE
 # =============================================================================
