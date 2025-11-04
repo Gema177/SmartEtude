@@ -22,14 +22,20 @@ def enforce_single_session(sender, request, user, **kwargs):
         current_key = request.session.session_key
 
     # Iterate over all sessions and remove other sessions for this user
+    # Also delete corrupted sessions (can't be decoded)
     for session in Session.objects.all():
         try:
             data = session.get_decoded()
+            # If session is for this user and not the current one, delete it
+            if data.get("_auth_user_id") == str(user.id) and session.session_key != current_key:
+                try:
+                    session.delete()
+                except Exception:
+                    # Never block login because of a deletion error
+                    pass
         except Exception:
-            continue
-        if data.get("_auth_user_id") == str(user.id) and session.session_key != current_key:
+            # Session is corrupted (can't decode), delete it
             try:
                 session.delete()
             except Exception:
-                # Never block login because of a deletion error
                 pass
