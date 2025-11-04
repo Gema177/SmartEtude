@@ -234,6 +234,7 @@ else:
 # Configuration WhiteNoise
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_AUTOREFRESH = DEBUG  # Recharger automatiquement en développement seulement
+WHITENOISE_ROOT = BASE_DIR / 'staticfiles'  # Répertoire racine pour les fichiers statiques
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
