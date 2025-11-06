@@ -415,7 +415,8 @@ def game_quiz(request, quiz_id: str):
         # Créer une tentative
         attempt = QuizAttempt.objects.create(
             quiz=quiz,
-            user_name=request.POST.get('user_name', 'Anonyme'),
+            user=request.user if request.user.is_authenticated else None,
+            user_name=request.POST.get('user_name', request.user.username if request.user.is_authenticated else 'Anonyme'),
             answers=answers,
             score=results['score'],
             total_questions=quiz_data['total_questions'],
@@ -459,7 +460,8 @@ def debug_game_quiz(request, quiz_id: str):
         # Créer une tentative
         attempt = QuizAttempt.objects.create(
             quiz=quiz,
-            user_name=request.POST.get('user_name', 'Anonyme'),
+            user=request.user if request.user.is_authenticated else None,
+            user_name=request.POST.get('user_name', request.user.username if request.user.is_authenticated else 'Anonyme'),
             answers=answers,
             score=results['score'],
             total_questions=quiz_data['total_questions'],
